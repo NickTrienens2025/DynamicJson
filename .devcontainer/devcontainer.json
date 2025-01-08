@@ -1,0 +1,12 @@
+{
+    "image": "swiftlang/swift:nightly-main",
+    "features": {},
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "vknabel.vscode-swift-development-environment"
+            ]
+        }
+    },
+      "postCreateCommand": "swift --version"
+}
