@@ -15,17 +15,43 @@ public enum JSONCommentRemover {
         var uncommentedString = ""
         let lines = jsonString.components(separatedBy: .newlines)
         var insideTripleBackticks = false
+        var stack = [Character]()
+        var appendCurrent = false
         for line in lines {
+            appendCurrent = false
+            for char in line {
+                switch char {
+                case "{", "[":
+                    stack.append(char)
+                case "}":
+                    if stack.last == "{" {
+                        stack.removeLast()
+                    }
+                case "]":
+                    if stack.last == "[" {
+                        stack.removeLast()
+                    }
+                    appendCurrent = true
+                default:
+                    break
+                }
+            }
             if line.contains("```") {
                 insideTripleBackticks.toggle()
                 continue
             }
-            if let commentRange = line.range(of: "//") {
-                let nonCommentPart = line[..<commentRange.lowerBound]
-                // Only add the line if it contains non-whitespace characters before the comment.
-                if nonCommentPart.trimmingCharacters(in: .whitespaces).isEmpty == false {
-                    uncommentedString.append(String(nonCommentPart))
-                }
+            if appendCurrent {
+               uncommentedString.append(line)
+           } else if stack.isEmpty {
+                // if let commentRange = line.range(of: "//") {
+                //     let nonCommentPart = line[..<commentRange.lowerBound]
+                //     // Only add the line if it contains non-whitespace characters before the comment.
+                //     if nonCommentPart.trimmingCharacters(in: .whitespaces).isEmpty == false {
+                //         uncommentedString.append(String(nonCommentPart))
+                //     }
+                // } else {
+                //     uncommentedString.append(line)
+                // }
             } else {
                 uncommentedString.append(line)
             }

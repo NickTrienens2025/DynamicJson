@@ -14,8 +14,37 @@ final class JSONRepairTests: XCTestCase {
         kjashdfjlkhasdjkf
         ```json
         
-        [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 ]
+        [ 
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 
+        ]
         
+        ```
+        """
+        let test = JSONCommentRemover.removeComments(from: string)
+        print(test)
+        let json = try JSONCommentRemover.createJson(from: test)
+        print( json)
+    }
+    
+    func testRepairTicks() throws {
+        let string = """
+        ```json
+        [ 
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 
+        ]
+        ```
+        """
+        let test = JSONCommentRemover.removeComments(from: string)
+        print(test)
+        let json = try JSONCommentRemover.createJson(from: test)
+        print( json)
+    }
+    
+    func testRepairTicks2() throws {
+        let string = """
+        ```json
+        [ 
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 ]
         ```
         """
         let test = JSONCommentRemover.removeComments(from: string)
