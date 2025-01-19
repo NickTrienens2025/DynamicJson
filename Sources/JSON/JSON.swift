@@ -11,19 +11,19 @@ public enum JSON:
     case number(Double)
     case null
     case string(String)
-
+    
     public init(_ array: [Any?]) {
         self = array.json
     }
-
+    
     public init(_ dictionary: [String: Any?]) {
         self = dictionary.json
     }
-
+    
     public subscript(key: String) -> JSON? {
         get {
             guard case let .dictionary(dict) = self else { return nil }
-            return dict[key]
+            return dict[key] ?? .null
         }
         set {
             guard case var .dictionary(dict) = self else { return }
@@ -35,7 +35,7 @@ public enum JSON:
             self = .dictionary(dict)
         }
     }
-
+    
     public subscript(key: String) -> [Any?]? {
         get {
             guard case let .dictionary(dict) = self else { return nil }
@@ -51,7 +51,7 @@ public enum JSON:
             self = .dictionary(dict)
         }
     }
-
+    
     public subscript(key: String) -> Bool? {
         get {
             guard case let .dictionary(dict) = self else { return nil }
@@ -67,7 +67,7 @@ public enum JSON:
             self = .dictionary(dict)
         }
     }
-
+    
     public subscript(key: String) -> [String: Any?]? {
         get {
             guard case let .dictionary(dict) = self else { return nil }
@@ -83,7 +83,7 @@ public enum JSON:
             self = .dictionary(dict)
         }
     }
-
+    
     public subscript(key: String) -> Double? {
         get {
             guard case let .dictionary(dict) = self else { return nil }
@@ -99,7 +99,7 @@ public enum JSON:
             self = .dictionary(dict)
         }
     }
-
+    
     public subscript(key: String) -> Int? {
         get {
             guard case let .dictionary(dict) = self else { return nil }
@@ -115,7 +115,7 @@ public enum JSON:
             self = .dictionary(dict)
         }
     }
-
+    
     public subscript(key: String) -> String? {
         get {
             guard case let .dictionary(dict) = self else { return nil }
@@ -131,7 +131,7 @@ public enum JSON:
             self = .dictionary(dict)
         }
     }
-
+    
     public subscript(index: Int) -> JSON? {
         get {
             guard case let .array(arr) = self, index < arr.count
@@ -144,31 +144,140 @@ public enum JSON:
             self = .array(arr)
         }
     }
-
+    
+    // Accessors
+    
+    /// Gets the JSON at a given path.
+    ///
+    /// - Complexity: _O(n)_ where _n_ is the number of elements in the path.
+    ///
+    /// If an `.array` case is found, the path key will be converted to an index and
+    /// the array element at that index will be returned. If key to index conversion fails,
+    /// or the index it outside the range of the array, `.null` is returned.
+    ///
+    /// - Parameter path: The keys and indexes to the desired JSON value(s).
+    /// - Returns: Thw JSON value(s) found at the path passed in. You will get a `.null` case
+    ///   if no JSON is found at the given path.
+    public func get(_ path: [String]) -> JSON {
+        return path.reduce(self) { json, key in
+            switch json {
+            case let .dictionary(object): return object[key] ?? .null
+            case let .array(array) where Int(key) != nil:
+                guard let index = Int(key), index >= array.startIndex && index < array.endIndex else { return .null }
+                return array[index]
+            default: return .null
+            }
+        }
+    }
+    
+    /// Sets the value of an object key or array index.
+    ///
+    /// - Complexity: _O(n)_, where _n_ is the number of elements in the `path`. This method is
+    ///   recursive, so you may have adverse performance for long paths.
+    ///
+    /// - Parameters:
+    ///   - path: The path of the value to set.
+    ///   - json: The JSON value to set the index or key to.
+    public mutating func set<Path>(_ path: Path, to json: JSON) where Path: Collection, Path.Element == String {
+        if let key = path.first {
+            switch self {
+            case var .dictionary(object):
+                if object[key] == nil { object[key] = .null }
+                object[key]?.set(path.dropFirst(), to: json)
+                self = .dictionary(object)
+            case var .array(array) where Int(key) != nil:
+                guard let index = Int(key) else { return }
+                array[index].set(path.dropFirst(), to: json)
+                self = .array(array)
+            default:
+                var value = JSON.null
+                value.set(path.dropFirst(), to: json)
+                if let index = Int(key) {
+                    self = .array(Array(repeating: .null, count: index) + [value])
+                } else {
+                    self = .dictionary([key: value])
+                }
+            }
+        } else {
+            self = json
+        }
+    }
+    
+    /// Removes a key/value pair from an object at a given path.
+    ///
+    /// The `JSON` type converts `nil` to it's `.null` case, so if you try to remove a value like this:
+    ///
+    ///     json["foo", "bar"] = nil
+    ///
+    /// You just set the object's property to `null`:
+    ///
+    ///     {
+    ///         "foo": {
+    ///             "bar": null
+    ///         }
+    ///     }
+    ///
+    /// To actually remove a property from an object, you use `.remove(_:)` with the path to the property to remove:
+    ///
+    ///     json.remove(["foo", "bar"])
+    ///
+    /// Will result in this json structure:
+    ///
+    ///     {
+    ///         "foo": {}
+    ///     }
+    ///
+    /// - Parameter path: The key path to the json property to remove.
+    ///
+    /// - Complexity: _O(n)_, where _n_ is the number of elements in the path to remove.
+    ///   Keep in mind that this method is recursive, so each succesive eleemnt in the path will
+    ///   add another call to the stack.
+//    public mutating func remove<Path>(_ path: Path) where Path: Collection, Path.Element == String {
+//        guard path.count > 0 else { return }
+//        if let key = path.first {
+//            
+//            guard var object = self.dictionaryValue else { return }
+//            
+//            if path.count == 1 {
+//                object[key] = nil
+//                self.dictionaryValue = object
+//            } else {
+//                if var json = object[key] {
+//                    json.remove(path.dropFirst())
+//                    self[key] = json
+//                }
+//            }
+//        }
+//    }
+    
+    
+    // Computed Varaiables
+    
+    
     /// Returns one of: `Array<Any>`, `Dictionary<String, Any>`,
     /// `Bool`, `NSNull`, `Double`, or `String`.
     public var rawValue: Any {
         switch self {
         case let .array(array):
             array.map(\.rawValue)
-
+            
         case let .boolean(bool):
             bool
-
+            
         case let .dictionary(dictionary):
             dictionary.mapValues(\.rawValue)
-
+            
         case .null:
             NSNull()
-
+            
         case let .number(number):
             number
-
+            
         case let .string(string):
             string
         }
     }
-
+    
     /// Returns a `Array<Any>` representation of the receiver.
     /// The returned value is suitable for encoding as JSON via
     /// `JSONSerialization.data(withJSONObject:options:)`.
@@ -176,21 +285,21 @@ public enum JSON:
         guard let json = rawValue as? [Any] else { return nil }
         return json
     }
-
+    
     /// Returns a `Bool` representation of the receiver if the
     /// underlying type is `.boolean`, otherwise `nil`.
     public var boolValue: Bool? {
         guard let bool = rawValue as? Bool else { return nil }
         return bool
     }
-
+    
     /// Returns a `Double` representation of the receiver if the
     /// underlying type is `.number`, otherwise `nil`.
     public var doubleValue: Double? {
         guard let double = rawValue as? Double else { return nil }
         return double
     }
-
+    
     /// Returns a `Dictionary<String, Any>` representation of the receiver.
     /// The returned value is suitable for encoding as JSON via
     /// `JSONSerialization.data(withJSONObject:options:)`.
@@ -198,7 +307,7 @@ public enum JSON:
         guard let json = rawValue as? [String: Any] else { return nil }
         return json
     }
-
+    
     /// Returns a `Int` representation of the receiver if the
     /// underlying type is `.number`, otherwise `nil`.
     public var integerValue: Int? {
@@ -208,27 +317,27 @@ public enum JSON:
             nil
         }
     }
-
+    
     /// Returns a `String` representation of the receiver if the
     /// underlying type is `.string`, otherwise `nil`.
     public var stringValue: String? {
         guard let string = rawValue as? String else { return nil }
         return string
     }
-
+    
     /// Returns `true` if the receiver is an array, otherwise `false`.
     public var isArray: Bool {
         guard case .array = self else { return false }
         return true
     }
-
+    
     /// Returns `true` if the receiver is a JSON object (a "dictionary"),
     /// otherwise `false`.
     public var isObject: Bool {
         guard case .dictionary = self else { return false }
         return true
     }
-
+    
     public var description: String {
         String(describing: rawValue)
     }
@@ -249,7 +358,7 @@ extension JSON:
     public typealias Key = String
     public typealias StringLiteralType = String
     public typealias Value = Any?
-
+    
     public init(arrayLiteral elements: Any?...) {
         var array = [JSON]()
         for value in elements {
@@ -258,11 +367,11 @@ extension JSON:
         }
         self = .array(array)
     }
-
+    
     public init(booleanLiteral value: BooleanLiteralType) {
         self = .boolean(value)
     }
-
+    
     public init(dictionaryLiteral elements: (String, Any?)...) {
         var dictionary = [String: JSON]()
         for (key, value) in elements {
@@ -271,19 +380,19 @@ extension JSON:
         }
         self = .dictionary(dictionary)
     }
-
+    
     public init(floatLiteral value: Double) {
         self = .number(value)
     }
-
+    
     public init(integerLiteral value: Int) {
         self = .number(Double(value))
     }
-
+    
     public init(nilLiteral _: ()) {
         self = .null
     }
-
+    
     public init(stringLiteral value: String) {
         self = .string(value)
     }
@@ -294,22 +403,22 @@ extension JSON: Equatable {
         switch (arg1, arg2) {
         case let (.array(one), .array(two)):
             one == two
-
+            
         case let (.boolean(one), .boolean(two)):
             one == two
-
+            
         case let (.dictionary(one), .dictionary(two)):
             one == two
-
+            
         case let (.number(one), .number(two)):
             one == two
-
+            
         case (.null, .null):
             true
-
+            
         case let (.string(one), .string(two)):
             one == two
-
+            
         default:
             false
         }
@@ -319,7 +428,7 @@ extension JSON: Equatable {
 extension JSON: Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-
+        
         if container.decodeNil() {
             self = .null
         } else if let bool = try? container.decode(Bool.self) {
@@ -339,26 +448,26 @@ extension JSON: Codable {
             )
         }
     }
-
+    
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
-
+        
         switch self {
         case .null:
             try container.encodeNil()
-
+            
         case let .boolean(bool):
             try container.encode(bool)
-
+            
         case let .number(double):
             try container.encode(double)
-
+            
         case let .string(string):
             try container.encode(string)
-
+            
         case let .array(array):
             try container.encode(array)
-
+            
         case let .dictionary(dictionary):
             try container.encode(dictionary)
         }
@@ -377,7 +486,7 @@ public extension JSON? {
             self = .dictionary(dict)
         }
     }
-
+    
     subscript(key: String) -> [Any?]? {
         get {
             guard case let .dictionary(dict) = self else { return nil }
@@ -393,7 +502,7 @@ public extension JSON? {
             self = .dictionary(dict)
         }
     }
-
+    
     subscript(key: String) -> Bool? {
         get {
             guard case let .dictionary(dict) = self else { return nil }
@@ -409,7 +518,7 @@ public extension JSON? {
             self = .dictionary(dict)
         }
     }
-
+    
     subscript(key: String) -> [String: Any?]? {
         get {
             guard case let .dictionary(dict) = self else { return nil }
@@ -425,7 +534,7 @@ public extension JSON? {
             self = .dictionary(dict)
         }
     }
-
+    
     subscript(key: String) -> Double? {
         get {
             guard case let .dictionary(dict) = self else { return nil }
@@ -441,7 +550,7 @@ public extension JSON? {
             self = .dictionary(dict)
         }
     }
-
+    
     subscript(key: String) -> Int? {
         get {
             guard case let .dictionary(dict) = self else { return nil }
@@ -457,7 +566,7 @@ public extension JSON? {
             self = .dictionary(dict)
         }
     }
-
+    
     subscript(key: String) -> String? {
         get {
             guard case let .dictionary(dict) = self else { return nil }
@@ -473,7 +582,7 @@ public extension JSON? {
             self = .dictionary(dict)
         }
     }
-
+    
     subscript(index: Int) -> JSON? {
         get {
             guard case let .array(arr) = self, index < arr.count
@@ -486,7 +595,7 @@ public extension JSON? {
             self = .array(arr)
         }
     }
-
+    
     /// Returns a `Array<Any>` representation of the receiver.
     /// The returned value is suitable for encoding as JSON via
     /// `JSONSerialization.data(withJSONObject:options:)`.
@@ -494,21 +603,21 @@ public extension JSON? {
         guard let json = self?.rawValue as? [Any] else { return nil }
         return json
     }
-
+    
     /// Returns a `Bool` representation of the receiver if the
     /// underlying type is `.boolean`, otherwise `nil`.
     var boolValue: Bool? {
         guard let bool = self?.rawValue as? Bool else { return nil }
         return bool
     }
-
+    
     /// Returns a `Double` representation of the receiver if the
     /// underlying type is `.number`, otherwise `nil`.
     var doubleValue: Double? {
         guard let double = self?.rawValue as? Double else { return nil }
         return double
     }
-
+    
     /// Returns a `Dictionary<String, Any>` representation of the receiver.
     /// The returned value is suitable for encoding as JSON via
     /// `JSONSerialization.data(withJSONObject:options:)`.
@@ -516,7 +625,7 @@ public extension JSON? {
         guard let json = self?.rawValue as? [String: Any] else { return nil }
         return json
     }
-
+    
     /// Returns a `Int` representation of the receiver if the
     /// underlying type is `.number`, otherwise `nil`.
     var integerValue: Int? {
@@ -526,91 +635,91 @@ public extension JSON? {
             nil
         }
     }
-
+    
     /// Returns a `String` representation of the receiver if the
     /// underlying type is `.string`, otherwise `nil`.
     var stringValue: String? {
         guard let string = self?.rawValue as? String else { return nil }
         return string
     }
-
+    
     /// Returns `true` if the receiver is an array, otherwise `false`.
     var isArray: Bool {
         guard let self, self.isArray else { return false }
         return true
     }
-
+    
     /// Returns `true` if the receiver is a JSON object (a "dictionary"),
     /// otherwise `false`.
     var isObject: Bool {
         guard let self, self.isObject else { return false }
         return true
     }
-
+    
     static func == (_ arg1: JSON, _ arg2: JSON?) -> Bool {
         guard let arg2 else { return false }
         return arg1 == arg2
     }
-
+    
     static func == (_ arg1: JSON?, _ arg2: JSON) -> Bool {
         guard let arg1 else { return false }
         return arg1 == arg2
     }
-
+    
     static func == (_ arg1: String, _ arg2: JSON?) -> Bool {
         guard let arg2, case let .string(unwrapped) = arg2
         else { return false }
         return arg1 == unwrapped
     }
-
+    
     static func == (_ arg1: JSON?, _ arg2: String) -> Bool {
         guard let arg1, case let .string(unwrapped) = arg1
         else { return false }
         return arg2 == unwrapped
     }
-
+    
     static func == (_: NSNull, _ arg2: JSON?) -> Bool {
         guard let arg2 else { return true }
         guard case .null = arg2 else { return false }
         return true
     }
-
+    
     static func == (_ arg1: JSON?, _: NSNull) -> Bool {
         guard let arg1 else { return true }
         guard case .null = arg1 else { return false }
         return true
     }
-
+    
     static func == (_ arg1: Int, _ arg2: JSON?) -> Bool {
         guard let arg2, case let .number(unwrapped) = arg2
         else { return false }
         return arg1 == Int(unwrapped)
     }
-
+    
     static func == (_ arg1: JSON?, _ arg2: Int) -> Bool {
         guard let arg1, case let .number(unwrapped) = arg1
         else { return false }
         return arg2 == Int(unwrapped)
     }
-
+    
     static func == (_ arg1: Double, _ arg2: JSON?) -> Bool {
         guard let arg2, case let .number(unwrapped) = arg2
         else { return false }
         return arg1 == unwrapped
     }
-
+    
     static func == (_ arg1: JSON?, _ arg2: Double) -> Bool {
         guard let arg1, case let .number(unwrapped) = arg1
         else { return false }
         return arg2 == unwrapped
     }
-
+    
     static func == (_ arg1: Bool, _ arg2: JSON?) -> Bool {
         guard let arg2, case let .boolean(unwrapped) = arg2
         else { return false }
         return arg1 == unwrapped
     }
-
+    
     static func == (_ arg1: JSON?, _ arg2: Bool) -> Bool {
         guard let arg1, case let .boolean(unwrapped) = arg1
         else { return false }
@@ -638,7 +747,7 @@ public extension [String: Any?] {
 private extension Any? {
     var json: JSON? {
         guard case let .some(element) = self else { return .null }
-
+        
         switch element {
         case let e as [Any?]: return e.json
         case let e as [String: Any?]: return e.json
@@ -646,8 +755,8 @@ private extension Any? {
         case let e as NSNumber where e.isBool: return .boolean(e.boolValue)
         case let e as NSNumber: return .number(e.doubleValue)
         case let e as String: return .string(e)
-        // The above cases should catch everything, but, in case they
-        // don't, we try remaining types here.
+            // The above cases should catch everything, but, in case they
+            // don't, we try remaining types here.
         case let e as Bool: return .boolean(e)
         case let e as Double: return .number(e)
         case let e as Float: return .number(Double(e))
@@ -673,3 +782,4 @@ private extension NSNumber {
         CFBooleanGetTypeID() == CFGetTypeID(self)
     }
 }
+
