@@ -119,3 +119,4 @@ extension Bool: JSONRepresentable {
 //extension UInt16: JSONRepresentable { }
 //extension UInt32: JSONRepresentable { }
 //extension UInt64: JSONRepresentable { }
+

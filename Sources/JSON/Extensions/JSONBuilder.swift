@@ -44,7 +44,7 @@ extension JSON {
     }
     
     public init(_ dictionary: [String: JSONRepresentable]) {
-        self = .dictionary(dictionary.mapValues{ $0.json })
+        self = .object(dictionary.mapValues{ $0.json })
     }
 }
 
@@ -61,11 +61,11 @@ public enum JSONBuilder {
     }
 
     public static func buildExpression(_ expression: [String: JSON]) -> JSON {
-        .dictionary(expression)
+        .object(expression)
     }
 
     public static func buildExpression(_ expression: [String: JSONRepresentable]) -> JSON {
-        .dictionary(expression.mapValues { value in
+        .object(expression.mapValues { value in
             value.json
         })
     }
@@ -95,15 +95,15 @@ public enum JSONBuilder {
     }
 
     public static func buildExpression(_ expression: Int) -> JSON {
-        .number(Double(expression))
+        .double(Double(expression))
     }
 
     public static func buildExpression(_ expression: Double) -> JSON {
-        .number(expression)
+        .double(expression)
     }
 
     public static func buildExpression(_ expression: Float) -> JSON {
-        .number(Double(expression))
+        .double(Double(expression))
     }
 
     public static func buildExpression(_ expression: Bool) -> JSON {
@@ -111,26 +111,26 @@ public enum JSONBuilder {
     }
 
     static func buildExpression(_ expression: [String: String]) -> JSON {
-        .dictionary(expression.mapValues { value in
+        .object(expression.mapValues { value in
             JSON.string(value)
         })
     }
 
     public static func buildExpression(_ expression: [String: Int]) -> JSON {
-        .dictionary(expression.mapValues { value in
-            JSON.number(Double(value))
+        .object(expression.mapValues { value in
+            JSON.double(Double(value))
         })
     }
 
     public static func buildExpression(_ expression: [String: Double]) -> JSON {
-        .dictionary(expression.mapValues { value in
-            JSON.number(value)
+        .object(expression.mapValues { value in
+            JSON.double(value)
         })
     }
 
     public static func buildExpression(_ expression: [String: Float]) -> JSON {
-        .dictionary(expression.mapValues { value in
-            JSON.number(Double(value))
+        .object(expression.mapValues { value in
+            JSON.double(Double(value))
         })
     }
 
@@ -141,7 +141,7 @@ public enum JSONBuilder {
 //    }
 
     public static func buildExpression(_ expression: [String: Bool]) -> JSON {
-        .dictionary(expression.mapValues { value in
+        .object(expression.mapValues { value in
             JSON.boolean(value)
         })
     }

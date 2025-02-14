@@ -18,7 +18,7 @@ public extension JSON {
     func findNodes(forKey key: String, path: [String] = [], parent: JSON? = nil) -> [JSONNodeWithPath] {
         var results: [JSONNodeWithPath] = []
         switch self {
-        case .null, .boolean, .string, .number:
+        case .null, .boolean, .string, .double, .integer:
             break // leaf node, no children
         case .array(let array):
             for (index, child) in array.enumerated() {
@@ -26,7 +26,7 @@ public extension JSON {
                 let childResults = child.findNodes(forKey: key, path: childPath, parent: self)
                 results.append(contentsOf: childResults)
             }
-        case .dictionary(let object):
+        case .object(let object):
             for (childKey, child) in object {
                 let childPath = path + [childKey]
                 if childKey == key {
@@ -42,7 +42,7 @@ public extension JSON {
     
     func findFirstNode(include: (String?, JSON) -> Bool, path: [String] = [], parent: JSON? = nil) -> JSONNodeWithPath? {
         switch self {
-        case .null, .boolean, .string, .number:
+        case .null, .boolean, .string, .double, .integer:
             break // leaf node, no children
         case .array(let array):
             for (index, child) in array.enumerated() {
@@ -54,7 +54,7 @@ public extension JSON {
                     return childResult
                 }
             }
-        case .dictionary(let object):
+        case .object(let object):
             for (childKey, child) in object {
                 let childPath = path + [childKey]
                 if include(childKey, child) {
@@ -72,7 +72,7 @@ public extension JSON {
     func findNodes(include: (String?, JSON) -> Bool, path: [String] = [], parent: JSON? = nil) -> [JSONNodeWithPath] {
         var results: [JSONNodeWithPath] = []
         switch self {
-        case .null, .boolean, .string, .number:
+        case .null, .boolean, .string, .double, .integer:
             break // leaf node, no children
         case .array(let array):
             for (index, child) in array.enumerated() {
@@ -84,7 +84,7 @@ public extension JSON {
                 let childResults = child.findNodes(include: include, path: childPath, parent: self)
                 results.append(contentsOf: childResults)
             }
-        case .dictionary(let object):
+        case .object(let object):
             for (childKey, child) in object {
                 let childPath = path + [childKey]
                 if include(childKey, child) {

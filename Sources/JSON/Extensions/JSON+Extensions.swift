@@ -28,7 +28,7 @@ extension JSON {
                 }
             }
             return .array(newArray)
-        case .dictionary(let obj):
+        case .object(let obj):
             var newObject: [String: JSON] = [:]
             for (key, value) in obj {
                 if case .array(let innerArray) = value, innerArray.isEmpty {
@@ -37,7 +37,7 @@ extension JSON {
                     newObject[key] = value.removingEmptyArrays()
                 }
             }
-            return .dictionary(newObject)
+            return .object(newObject)
         default:
             return self
         }
@@ -56,7 +56,7 @@ extension Array where Element == JSON {
 extension JSON {
    public var fuzzyFloat: Double {
         switch self {
-        case .number(let number):
+        case .double(let number):
             return number
             
         default:
