@@ -230,10 +230,10 @@ public enum JSON:
     /// Returns a `Array<Any>` representation of the receiver.
     /// The returned value is suitable for encoding as JSON via
     /// `JSONSerialization.data(withJSONObject:options:)`.
-//    public var arrayValue: [JSON]? {
-//        guard let json = rawValue as? [JSON] else { return nil }
-//        return json
-//    }
+    public var arrayValue: [JSON]? {
+        guard let json = rawValue as? [JSON] else { return nil }
+        return json
+    }
     
     /// Returns a `Bool` representation of the receiver if the
     /// underlying type is `.boolean`, otherwise `nil`.
