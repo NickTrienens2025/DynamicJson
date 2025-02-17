@@ -199,7 +199,6 @@ public enum JSON:
     
     // Computed Varaiables
     
-    
     /// Returns one of: `Array<Any>`, `Dictionary<String, Any>`,
     /// `Bool`, `NSNull`, `Double`, or `String`.
     public var rawValue: Any? {
@@ -231,8 +230,12 @@ public enum JSON:
     /// The returned value is suitable for encoding as JSON via
     /// `JSONSerialization.data(withJSONObject:options:)`.
     public var arrayValue: [JSON]? {
-        guard let json = rawValue as? [JSON] else { return nil }
-        return json
+        switch self {
+        case .array(let double):
+            return double
+        default:
+            return nil
+        }
     }
     
     /// Returns a `Bool` representation of the receiver if the
@@ -253,8 +256,12 @@ public enum JSON:
     /// The returned value is suitable for encoding as JSON via
     /// `JSONSerialization.data(withJSONObject:options:)`.
     public var dictionaryValue: [String: JSON]? {
-        guard let json = rawValue as? [String: JSON] else { return nil }
-        return json
+        switch self {
+        case .object(let double):
+            return double
+        default:
+            return nil
+        }
     }
     
     /// Returns a `Int` representation of the receiver if the
