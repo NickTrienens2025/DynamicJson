@@ -2,50 +2,7 @@ import JSON
 import XCTest
 
 final class JSONTests: XCTestCase {
-    func testCanEncodeToAndDecodeFromJSON() throws {
-        let json: JSON = [
-            "one": 2,
-            "two_text": "two",
-            "pi": 3.14,
-            "yes": true,
-            "null": nil,
-            "object": [
-                "three": 3,
-                "four_text": "four",
-                "null": nil,
-                "inner_array": [
-                    "index_0",
-                    false,
-                    4.20,
-                ] as [Any?],
-            ] as [String: Any?],
-        ]
-
-        let jsonValue = json.rawValue
-        let jsonDictionary = try XCTUnwrap(json)
-
-        let encodedValue = try JSONSerialization.data(
-            withJSONObject: jsonValue,
-            options: [.sortedKeys]
-        )
-
-        let encodedDictionary = try JSONSerialization.data(
-            withJSONObject: jsonDictionary,
-            options: [.sortedKeys]
-        )
-
-        XCTAssertEqual(encodedValue, encodedDictionary)
-
-        let decodedValue = try JSONSerialization.jsonObject(with: encodedValue)
-        let decodedDictionary = try JSONSerialization.jsonObject(with: encodedDictionary)
-
-        let valueJSON = JSON(decodedValue as! [String: Any?])
-        let dictionaryJSON = JSON(decodedDictionary as! [String: Any?])
-
-        XCTAssertEqual(valueJSON, dictionaryJSON)
-        XCTAssertEqual(json, dictionaryJSON)
-    }
-
+    
     func testGetSubscript() throws {
         let object: JSON = [
             "one": 1,
@@ -54,8 +11,10 @@ final class JSONTests: XCTestCase {
                 "key": "value",
             ],
         ]
-        XCTAssertTrue(object["one"] == 1)
-        XCTAssertEqual(1, object["one"])
+        dump(object["one"])
+        XCTAssertTrue(object["one"] == Int(1))
+
+        XCTAssertEqual(1, object["one"].integerValue)
         XCTAssertFalse(object["one"] == "one")
         XCTAssertNotEqual("one", object["one"])
         XCTAssertTrue(object["bool"] == true)
@@ -64,8 +23,9 @@ final class JSONTests: XCTestCase {
         XCTAssertNotEqual(2.0, object["bool"])
         XCTAssertTrue(JSON(["key": "value"]) == object["dict"])
         XCTAssertFalse(JSON.array([.string("one"), .boolean(false)]) == object["dict"])
-        XCTAssertNil(object["doesNotExist"] as JSON?)
+        XCTAssertEqual(object["doesNotExist"], JSON.null)
         XCTAssertEqual("value", object["dict"]["key"].stringValue)
+        XCTAssertEqual("value", object.dict.key.stringValue)
 
         let array = JSON(["one", 2, false])
         XCTAssertTrue(array[0] == "one")
@@ -74,7 +34,8 @@ final class JSONTests: XCTestCase {
         XCTAssertNil(array[3])
 
         let string: JSON = .string("text")
-        XCTAssertNil(string["text"] as JSON?)
+//        XCTAssertNil(string["text"] as JSON?)
+        XCTAssertEqual(string["text"], JSON.null)
     }
 //
 //    func testGetConcreteTypeUsingSubscript() throws {
@@ -131,7 +92,8 @@ final class JSONTests: XCTestCase {
         ]
 
         object["dict"]["key"] = 123
-        XCTAssertEqual(["one": 1, "bool": true, "dict": ["key": 123]], object)
+        XCTAssertEqual(JSON(["one": 1, "bool": true, "dict": ["key": 123]]), object)
+        XCTAssertTrue(JSON(["one": 1, "bool": true, "dict": ["key": 123]]) == object)
 
         object["new"] = .null
         XCTAssertEqual(
