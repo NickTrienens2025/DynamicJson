@@ -97,6 +97,15 @@ public extension JSON {
         return []
     }
     
+    @inlinable func map<T>(_ transform: (JSON) throws -> T) rethrows -> JSON {
+        switch self {
+        case let .array(jsonList):
+            return try JSON(jsonList.map(transform))
+        default: break
+        }
+        return JSON([])
+    }
+    
     func transformed(using mapping: [String: String]) -> JSON {
         switch self {
         case let .array(jsonList):
@@ -121,34 +130,38 @@ public extension JSON {
         }
         return JSON(resultObject)
     }
-//    
-//    func removeKey(_ key: String) -> JSON {
-//        var json = self
-//        removeKey(key, from: &json)
-//        return json
-//    }
-//    
-//    func removeKey(_ key: String, from json: inout JSON) {
-//        // If the JSON is an object, check each key
-//        if let object = json.dictionaryValue {
-//            for currentKey in object.keys {
-//                // If the current key matches the key to remove, then remove it
-//                if currentKey == key {
-//                    json.remove([currentKey])
-//                } else {
-//                    // Otherwise, go deeper into the structure
-//                    var nestedJSON = json[currentKey]
-//                    removeKey(key, from: &nestedJSON)
-//                    json.set([currentKey], to: nestedJSON)
-//                }
-//            }
-//        }
-//        // If the JSON is an array, iterate over each element
-//        else if let array = json.arrayValue {
-//            for (index, var item) in array.enumerated() {
-//                removeKey(key, from: &item)
-//                json.set([String(index)], to: item)
-//            }
-//        }
-//    }
+
+    mutating func removingKey(_ key: String) {
+        removeKey(key, from: &self)
+    }
+    
+    func removeKey(_ key: String) -> JSON {
+        var json = self
+        removeKey(key, from: &json)
+        return json
+    }
+    
+    func removeKey(_ key: String, from json: inout JSON) {
+        // If the JSON is an object, check each key
+        if let object = json.dictionaryValue {
+            for currentKey in object.keys {
+                // If the current key matches the key to remove, then remove it
+                if currentKey == key {
+                    json.remove([currentKey])
+                } else {
+                    // Otherwise, go deeper into the structure
+                    var nestedJSON = json[currentKey]
+                    removeKey(key, from: &nestedJSON)
+                    json.set([currentKey], to: nestedJSON)
+                }
+            }
+        }
+        // If the JSON is an array, iterate over each element
+        else if let array = json.arrayValue {
+            for (index, var item) in array.enumerated() {
+                removeKey(key, from: &item)
+                json.set([String(index)], to: item)
+            }
+        }
+    }
 }

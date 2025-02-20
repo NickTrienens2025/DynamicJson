@@ -1,7 +1,5 @@
 import Foundation
 
-
-
 public enum JSONCommentRemover {
     public static func createJson(from jsonString: String) throws -> JSON {
         if let data = jsonString.data(using: .utf8) {

@@ -68,7 +68,6 @@ public extension JSON {
         return nil
     }
 
-        
     func findNodes(include: (String?, JSON) -> Bool, path: [String] = [], parent: JSON? = nil) -> [JSONNodeWithPath] {
         var results: [JSONNodeWithPath] = []
         switch self {

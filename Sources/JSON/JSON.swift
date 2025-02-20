@@ -196,7 +196,6 @@ public enum JSON:
         }
     }
     
-    
     // Computed Varaiables
     
     /// Returns one of: `Array<Any>`, `Dictionary<String, Any>`,
@@ -313,7 +312,11 @@ public enum JSON:
     
     public var jsonString: String {
         let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted
+        if #available(macOS 10.15, *) {
+            encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys]
+        } else {
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        }
         if let data = try? encoder.encode(self),
            let jString = String(data: data, encoding: .utf8) {
             return jString
@@ -495,86 +498,6 @@ public extension JSON? {
         }
     }
     
-//    subscript(key: String) -> Bool? {
-//        get {
-//            guard case let .object(dict) = self else { return nil }
-//            return dict[key]?.boolValue
-//        }
-//        set {
-//            guard case var .object(dict) = self else { return }
-//            if let newValue {
-//                dict[key] = .boolean(newValue)
-//            } else {
-//                dict.removeValue(forKey: key)
-//            }
-//            self = .object(dict)
-//        }
-//    }
-//    
-//    subscript(key: String) -> [String: JSON]? {
-//        get {
-//            guard case let .object(dict) = self else { return nil }
-//            return dict[key]?.dictionaryValue
-//        }
-//        set {
-//            guard case var .object(dict) = self else { return }
-//            if let newValue {
-//                dict[key] = .object(newValue.compactMapValues(\.json))
-//            } else {
-//                dict.removeValue(forKey: key)
-//            }
-//            self = .object(dict)
-//        }
-//    }
-//    
-//    subscript(key: String) -> Double? {
-//        get {
-//            guard case let .object(dict) = self else { return nil }
-//            return dict[key]?.doubleValue
-//        }
-//        set {
-//            guard case var .object(dict) = self else { return }
-//            if let newValue {
-//                dict[key] = .double(newValue)
-//            } else {
-//                dict.removeValue(forKey: key)
-//            }
-//            self = .object(dict)
-//        }
-//    }
-//    
-//    subscript(key: String) -> Int? {
-//        get {
-//            guard case let .object(dict) = self else { return nil }
-//            return dict[key]?.integerValue
-//        }
-//        set {
-//            guard case var .object(dict) = self else { return }
-//            if let newValue {
-//                dict[key] = .double(Double(newValue))
-//            } else {
-//                dict.removeValue(forKey: key)
-//            }
-//            self = .object(dict)
-//        }
-//    }
-//    
-//    subscript(key: String) -> String? {
-//        get {
-//            guard case let .object(dict) = self else { return nil }
-//            return dict[key]?.stringValue
-//        }
-//        set {
-//            guard case var .object(dict) = self else { return }
-//            if let newValue {
-//                dict[key] = .string(newValue)
-//            } else {
-//                dict.removeValue(forKey: key)
-//            }
-//            self = .object(dict)
-//        }
-//    }
-    
     subscript(index: Int) -> JSON? {
         get {
             guard case let .array(arr) = self, index < arr.count
@@ -652,17 +575,6 @@ public extension JSON? {
         return true
     }
     
-//
-//    static func == (_ arg1: JSON, _ arg2: JSON?) -> Bool {
-//        guard let arg2 else { return false }
-//        return arg1 == arg2
-//    }
-//    
-//    static func == (_ arg1: JSON?, _ arg2: JSON) -> Bool {
-//        guard let arg1 else { return false }
-//        return arg1 == arg2
-//    }
-//    
     static func == (_ arg1: String, _ arg2: JSON?) -> Bool {
         guard let arg2, case let .string(unwrapped) = arg2
         else { return false }
@@ -674,19 +586,7 @@ public extension JSON? {
         else { return false }
         return arg2 == unwrapped
     }
-//    
-//    static func == (_: NSNull, _ arg2: JSON?) -> Bool {
-//        guard let arg2 else { return true }
-//        guard case .null = arg2 else { return false }
-//        return true
-//    }
-//    
-//    static func == (_ arg1: JSON?, _: NSNull) -> Bool {
-//        guard let arg1 else { return true }
-//        guard case .null = arg1 else { return false }
-//        return true
-//    }
-//    
+
     static func == (_ arg1: Int, _ arg2: JSON?) -> Bool {
         guard let arg2, case let .integer(unwrapped) = arg2
         else { return false }

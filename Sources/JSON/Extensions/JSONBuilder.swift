@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 extension String.SubSequence {
     var asString: String {
         String(self)
