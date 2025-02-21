@@ -324,6 +324,16 @@ public enum JSON:
             return description
         }
     }
+    
+    public func asData() throws -> Data {
+        let encoder = JSONEncoder()
+        if #available(macOS 10.15, *) {
+            encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys]
+        } else {
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        }
+        return try encoder.encode(self)
+    }
 }
 
 
