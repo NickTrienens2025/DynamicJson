@@ -310,6 +310,7 @@ public enum JSON:
           }
       }
     
+    // MARK:  - Conversions
     public var jsonString: String {
         let encoder = JSONEncoder()
         if #available(macOS 10.15, *) {

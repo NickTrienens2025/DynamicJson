@@ -172,8 +172,8 @@ final class JSONTests: XCTestCase {
         XCTAssertNil(JSON.double(1.0).boolValue)
 
         let dict = try XCTUnwrap(JSON(["one": "one", "two": 1.23]).dictionaryValue)
-        XCTAssertEqual("one", dict["one"] as? String)
-        XCTAssertEqual(1.23, dict["two"] as? Double)
+        XCTAssertEqual("one", dict["one"]?.stringValue)
+        XCTAssertEqual(1.23, dict["two"]?.doubleValue)
 
         XCTAssertEqual(3.14, JSON.double(3.14).doubleValue)
         XCTAssertEqual(3, JSON.double(3.14).integerValue)
@@ -185,7 +185,7 @@ final class JSONTests: XCTestCase {
     }
 
     func testOptionalSpecializedValues() throws {
-        let arr: JSON? = JSON(["one", 123, 1.23])
+        let arr: JSON = JSON(["one", 123, 1.23])
         XCTAssertEqual(3, arr.arrayValue?.count)
         XCTAssertEqual("one", arr[0].stringValue)
         XCTAssertEqual(123, arr[1].integerValue)
@@ -196,7 +196,7 @@ final class JSONTests: XCTestCase {
         XCTAssertNil((JSON.double(0) as JSON?).boolValue)
         XCTAssertNil((JSON.double(1.0) as JSON?).boolValue)
 
-        let dict: JSON? = JSON(["one": "one", "two": 1.23])
+        let dict: JSON = JSON(["one": "one", "two": 1.23])
         XCTAssertEqual(2, dict.dictionaryValue?.count)
         XCTAssertEqual("one", dict["one"].stringValue)
         XCTAssertEqual(1.23, dict["two"].doubleValue)
@@ -211,8 +211,10 @@ final class JSONTests: XCTestCase {
     }
 
     func testEquatable() throws {
-        let arr: JSON? = JSON(["one", nil, 123, 1.23])
+        let arr = JSON(["one", nil, 123, 1.23])
         XCTAssertTrue(arr == JSON(["one", nil, 123, 1.23]))
+        XCTAssertEqual(arr, JSON(["one", nil, 123, 1.23]))
+
         XCTAssertTrue(JSON(["one", nil, 123, 1.23]) == arr)
         XCTAssertTrue(arr[0] == "one")
         XCTAssertTrue(arr[0] == "one")
