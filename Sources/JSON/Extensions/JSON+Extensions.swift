@@ -143,7 +143,7 @@ public extension JSON {
     
     func removeKey(_ key: String, from json: inout JSON) {
         // If the JSON is an object, check each key
-        if let object = json.dictionaryValue {
+        if let object = json.objectValue {
             for currentKey in object.keys {
                 // If the current key matches the key to remove, then remove it
                 if currentKey == key {

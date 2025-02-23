@@ -170,7 +170,7 @@ final class JSONTests: XCTestCase {
         XCTAssertNil(JSON.double(0).boolValue)
         XCTAssertNil(JSON.double(1.0).boolValue)
 
-        let dict = try XCTUnwrap(JSON(["one": "one", "two": 1.23]).dictionaryValue)
+        let dict = try XCTUnwrap(JSON(["one": "one", "two": 1.23]).objectValue)
         XCTAssertEqual("one", dict["one"]?.stringValue)
         XCTAssertEqual(1.23, dict["two"]?.doubleValue)
 
@@ -196,7 +196,7 @@ final class JSONTests: XCTestCase {
 //        XCTAssertNil((JSON.double(1.0) as JSON?).boolValue)
 
         let dict: JSON = JSON(["one": "one", "two": 1.23])
-        XCTAssertEqual(2, dict.dictionaryValue?.count)
+        XCTAssertEqual(2, dict.objectValue?.count)
         XCTAssertEqual("one", dict["one"].stringValue)
         XCTAssertEqual(1.23, dict["two"].doubleValue)
 

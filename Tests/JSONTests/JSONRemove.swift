@@ -13,7 +13,7 @@ final class JSONRemoveTests: XCTestCase {
         var json: JSON = ["name": "John", "age": 30]
         json.remove(["name"])
 
-        XCTAssertEqual(json.dictionaryValue?.count, 1)
+        XCTAssertEqual(json.objectValue?.count, 1)
         XCTAssertEqual(json["name"], JSON.null)
         XCTAssertEqual(json["age"].integerValue, 30)
     }
@@ -61,7 +61,7 @@ final class JSONRemoveTests: XCTestCase {
         var json: JSON = ["name": "John"]
         json.remove(["age"])
 
-        XCTAssertEqual(json.dictionaryValue?.count, 1)
+        XCTAssertEqual(json.objectValue?.count, 1)
         XCTAssertEqual(json["name"].stringValue, "John")
     }
 
@@ -82,7 +82,7 @@ final class JSONRemoveTests: XCTestCase {
         json.remove(["user", "profile", "email"])
 
         XCTAssertEqual(json["user"]["name"].stringValue, "John")
-        XCTAssertEqual(json.dictionaryValue?.count, 1)
+        XCTAssertEqual(json.objectValue?.count, 1)
     }
 
     func testRemoveAllNestedContent() {

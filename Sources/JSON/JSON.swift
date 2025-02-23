@@ -182,7 +182,7 @@ public enum JSON:
         guard path.count > 0 else { return }
         if let key = path.first {
             
-            guard var object = self.dictionaryValue else { return }
+            guard var object = self.objectValue else { return }
             
             if path.count == 1 {
                 object[key] = nil
@@ -247,10 +247,30 @@ public enum JSON:
             return nil
         }
     }
+    
+    public func asBool() -> Bool? {
+        switch self {
+        case .boolean(let value):
+            return value
+        default:
+            return nil
+        }
+    }
 
+    
     /// Returns a `Double` representation of the receiver if the
     /// underlying type is `.number`, otherwise `nil`.
     var doubleValue: Double? {
+        switch self {
+        case .double(let double):
+            return double
+        case .integer(let int):
+            return Double(int)
+        default:
+            return nil
+        }
+    }
+    func asDouble() -> Double? {
         switch self {
         case .double(let double):
             return double
@@ -264,7 +284,15 @@ public enum JSON:
     /// Returns a `Dictionary<String, Any>` representation of the receiver.
     /// The returned value is suitable for encoding as JSON via
     /// `JSONSerialization.data(withJSONObject:options:)`.
-    public var dictionaryValue: [String: JSON]? {
+    public var objectValue: [String: JSON]? {
+        switch self {
+        case .object(let double):
+            return double
+        default:
+            return nil
+        }
+    }
+    public func asObject() -> [String: JSON]? {
         switch self {
         case .object(let double):
             return double
@@ -286,9 +314,28 @@ public enum JSON:
         }
     }
     
+    public func asInteger() -> Int? {
+        switch self {
+        case .double(let double):
+            return Int(double)
+        case .integer(let int):
+            return int
+        default:
+            return nil
+        }
+    }
     /// Returns a `String` representation of the receiver if the
     /// underlying type is `.string`, otherwise `nil`.
     public var stringValue: String? {
+        switch self {
+        case .string(let value):
+            return value
+        default:
+            return nil
+        }
+    }
+    
+    public func asString() -> String? {
         switch self {
         case .string(let value):
             return value
