@@ -30,6 +30,8 @@ final class JSONRemoveTests: XCTestCase {
 
         json.remove(["user", "profile", "email"])
 
+        print( json.jsonString)
+        
         XCTAssertNotNil(json["user"]["profile"])
         XCTAssertEqual(json["user"]["profile"]["name"].stringValue, "John")
         XCTAssertEqual(json["user"]["profile"]["email"], JSON.null)
