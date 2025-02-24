@@ -29,7 +29,7 @@ final class ResultBuilderJSONTests: XCTestCase {
             ["int": 42]
             ["double": 3.14]
             ["bool": true]
-            ["float": Float(1.23)]
+            ["float": 1.23]
         }
 
         XCTAssertEqual(json[0]["string"].asString(), "value")

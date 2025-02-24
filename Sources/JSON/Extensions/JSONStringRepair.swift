@@ -1,6 +1,6 @@
 import Foundation
 
-public enum JSONCommentRemover {
+public enum JSONStringRepair {
     public static func createJson(from jsonString: String) throws -> JSON {
         if let data = jsonString.data(using: .utf8) {
             let decoder = JSONDecoder()
@@ -66,7 +66,7 @@ public enum JSONCommentRemover {
     public static func repairJSONString(_ jsonString: String) throws -> String {
           var stack = [String]()
           var isEscaping = false
-        var result = JSONCommentRemover.removeComments(from: jsonString.trimmingCharacters(in: .whitespacesAndNewlines))
+        var result = JSONStringRepair.removeComments(from: jsonString.trimmingCharacters(in: .whitespacesAndNewlines))
           
         let parsedJSON = Array(result)
           
@@ -132,7 +132,7 @@ public enum JSONCommentRemover {
 
     public static func repairJSON(_ str: String, debugging : Bool = false) throws -> String {
         var stack: [JSONContext] = []
-        var jsonString = JSONCommentRemover.removeComments(from: str).trimmingCharacters(in: .whitespacesAndNewlines)
+        var jsonString = JSONStringRepair.removeComments(from: str).trimmingCharacters(in: .whitespacesAndNewlines)
         
         var progressString = ""
         var lastStack = stack

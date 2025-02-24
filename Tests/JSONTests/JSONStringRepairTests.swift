@@ -20,9 +20,9 @@ final class JSONRepairTests: XCTestCase {
         
         ```
         """
-        let test = JSONCommentRemover.removeComments(from: string)
+        let test = JSONStringRepair.removeComments(from: string)
         print(test)
-        let json = try JSONCommentRemover.createJson(from: test)
+        let json = try JSONStringRepair.createJson(from: test)
         print( json)
     }
     
@@ -34,9 +34,9 @@ final class JSONRepairTests: XCTestCase {
         ]
         ```
         """
-        let test = JSONCommentRemover.removeComments(from: string)
+        let test = JSONStringRepair.removeComments(from: string)
         print(test)
-        let json = try JSONCommentRemover.createJson(from: test)
+        let json = try JSONStringRepair.createJson(from: test)
         print( json)
     }
     
@@ -47,9 +47,9 @@ final class JSONRepairTests: XCTestCase {
         1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 ]
         ```
         """
-        let test = JSONCommentRemover.removeComments(from: string)
+        let test = JSONStringRepair.removeComments(from: string)
         print(test)
-        let json = try JSONCommentRemover.createJson(from: test)
+        let json = try JSONStringRepair.createJson(from: test)
         print( json)
     }
 }
