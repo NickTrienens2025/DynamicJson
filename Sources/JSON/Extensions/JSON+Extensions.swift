@@ -16,6 +16,8 @@ extension JSON {
         }
     }
     
+    
+    
     public func removingEmptyArrays() -> JSON {
         switch self {
         case .array(let arr):
@@ -143,7 +145,7 @@ public extension JSON {
     
     func removeKey(_ key: String, from json: inout JSON) {
         // If the JSON is an object, check each key
-        if let object = json.objectValue {
+        if let object = json.asObject() {
             for currentKey in object.keys {
                 // If the current key matches the key to remove, then remove it
                 if currentKey == key {
@@ -157,7 +159,7 @@ public extension JSON {
             }
         }
         // If the JSON is an array, iterate over each element
-        else if let array = json.arrayValue {
+        else if let array = json.asArray() {
             for (index, var item) in array.enumerated() {
                 removeKey(key, from: &item)
                 json.set([String(index)], to: item)

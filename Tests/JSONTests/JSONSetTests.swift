@@ -15,21 +15,21 @@ final class JSONSetTests: XCTestCase {
 
         // Test setting nested value with path
         json.set(["user", "address", "country"], to: "USA")
-        XCTAssertEqual(json["user"]["address"]["country"].stringValue, "USA")
+        XCTAssertEqual(json["user"]["address"]["country"].asString(), "USA")
 
         // Test setting value that creates new nested structure
         json.set(["company", "name"], to: "Apple")
-        XCTAssertEqual(json["company"]["name"].stringValue, "Apple")
+        XCTAssertEqual(json["company"]["name"].asString(), "Apple")
 
         // Test overwriting existing value
         json.set(["user", "name"], to: "Jane")
-        XCTAssertEqual(json["user"]["name"].stringValue, "Jane")
+        XCTAssertEqual(json["user"]["name"].asString(), "Jane")
 
         // Test setting array
         json.set(["scores"], to: [100, 85, 95])
-        XCTAssertEqual(json["scores"].arrayValue?.count, 3)
-        XCTAssertEqual(json["scores"][0].integerValue, 100)
-        XCTAssertEqual(json["scores"][2].integerValue, 95)
+        XCTAssertEqual(json["scores"].asArray()?.count, 3)
+        XCTAssertEqual(json["scores"][0].asInt(), 100)
+        XCTAssertEqual(json["scores"][2].asInt(), 95)
     }
 
     func testSetWithDynamicMemberLookup() {
@@ -43,17 +43,17 @@ final class JSONSetTests: XCTestCase {
 
         // Test setting with subscript
         json["user"]["profile"]["name"] = "Jane"
-        XCTAssertEqual(json["user"]["profile"]["name"].stringValue, "Jane")
+        XCTAssertEqual(json["user"]["profile"]["name"].asString(), "Jane")
 
         // Test creating new nested structure
         json["user"]["settings"] = ["theme": "dark"]
-        XCTAssertEqual(json["user"]["settings"]["theme"].stringValue, "dark")
+        XCTAssertEqual(json["user"]["settings"]["theme"].asString(), "dark")
 
         // Test setting array values
         json["user"]["scores"] = [90, 85, 95]
-        XCTAssertEqual(json["user"]["scores"][0].integerValue, 90)
-        XCTAssertEqual(json["user"]["scores"][1].integerValue, 85)
-        XCTAssertEqual(json["user"]["scores"][2].integerValue, 95)
+        XCTAssertEqual(json["user"]["scores"][0].asInt(), 90)
+        XCTAssertEqual(json["user"]["scores"][1].asInt(), 85)
+        XCTAssertEqual(json["user"]["scores"][2].asInt(), 95)
     }
 
     func testSetWithSubscript() {
@@ -66,11 +66,11 @@ final class JSONSetTests: XCTestCase {
 
         // Test setting object values
         json["config"]["version"] = 2
-        XCTAssertEqual(json["config"]["version"].integerValue, 2)
+        XCTAssertEqual(json["config"]["version"].asInt(), 2)
 
         // Test setting array values
         json["config"]["features"][1] = "updated"
-        XCTAssertEqual(json["config"]["features"][1].stringValue, "updated")
+        XCTAssertEqual(json["config"]["features"][1].asString(), "updated")
 
         // Test setting new key in existing object
         print(json["config"])
@@ -80,7 +80,7 @@ final class JSONSetTests: XCTestCase {
         json["config"]["newKey"] = true
         print(json.config.newKey.boolValue)
         print(json["config"]["newKey"].asBool())
-        print(json.jsonString)
+        print(json.asJsonString())
         if let value: Bool = json["config"]["newKey"].asBool() {
             XCTAssertEqual(value, true)
         }
@@ -88,8 +88,8 @@ final class JSONSetTests: XCTestCase {
 
         // Test setting nested object
         json["config"]["database"] = ["host": "localhost", "port": 5432]
-        XCTAssertEqual(json["config"]["database"]["host"].stringValue, "localhost")
-        XCTAssertEqual(json["config"]["database"]["port"].integerValue, 5432)
+        XCTAssertEqual(json["config"]["database"]["host"].asString(), "localhost")
+        XCTAssertEqual(json["config"]["database"]["port"].asInt(), 5432)
     }
 
     func testSetEdgeCases() {
@@ -97,17 +97,17 @@ final class JSONSetTests: XCTestCase {
 
         // Test setting on null JSON
         json.set(["key"], to: "value")
-        XCTAssertEqual(json["key"].stringValue, "value")
+        XCTAssertEqual(json["key"].asString(), "value")
 
         // Test setting on primitive value
         var primitiveJson: JSON = "string"
         primitiveJson.set(["key"], to: "value")
-        XCTAssertEqual(primitiveJson["key"].stringValue, "value")
+        XCTAssertEqual(primitiveJson["key"].asString(), "value")
 
         // Test setting empty path
         var emptyPathJson: JSON = ["existing": "value"]
         emptyPathJson.set([], to: ["new": "value"])
-        XCTAssertEqual(emptyPathJson["new"].stringValue, "value")
+        XCTAssertEqual(emptyPathJson["new"].asString(), "value")
 
         // Test setting various JSON types
         var typesJson: JSON = [:]
@@ -118,11 +118,11 @@ final class JSONSetTests: XCTestCase {
         typesJson.set(["array"], to: [1, 2, 3])
         typesJson.set(["object"], to: ["key": "value"])
 
-        XCTAssertEqual(typesJson["string"].stringValue, "text")
-        XCTAssertEqual(typesJson["number"].integerValue, 42)
-        XCTAssertEqual(typesJson["boolean"].boolValue, true)
+        XCTAssertEqual(typesJson["string"].asString(), "text")
+        XCTAssertEqual(typesJson["number"].asInt(), 42)
+        XCTAssertEqual(typesJson["boolean"].asBool(), true)
         XCTAssertEqual(typesJson["null"], .null)
-        XCTAssertEqual(typesJson["array"][0].integerValue, 1)
-        XCTAssertEqual(typesJson["object"]["key"].stringValue, "value")
+        XCTAssertEqual(typesJson["array"][0].asInt(), 1)
+        XCTAssertEqual(typesJson["object"]["key"].asString(), "value")
     }
 }

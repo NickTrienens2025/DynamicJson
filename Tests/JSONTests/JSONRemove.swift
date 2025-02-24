@@ -13,9 +13,11 @@ final class JSONRemoveTests: XCTestCase {
         var json: JSON = ["name": "John", "age": 30]
         json.remove(["name"])
 
-        XCTAssertEqual(json.objectValue?.count, 1)
+        XCTAssertEqual(json.asObject()?.count, 1)
         XCTAssertEqual(json["name"], JSON.null)
-        XCTAssertEqual(json["age"].integerValue, 30)
+        
+        XCTAssertEqual(json.age.asInt(), 30)
+        XCTAssertEqual(json["age"].asInt(), 30)
     }
 
     func testRemoveNestedKey() {
@@ -33,7 +35,7 @@ final class JSONRemoveTests: XCTestCase {
         print( json.jsonString)
         
         XCTAssertNotNil(json["user"]["profile"])
-        XCTAssertEqual(json["user"]["profile"]["name"].stringValue, "John")
+        XCTAssertEqual(json["user"]["profile"]["name"].asString(), "John")
         XCTAssertEqual(json["user"]["profile"]["email"], JSON.null)
     }
 
@@ -41,28 +43,28 @@ final class JSONRemoveTests: XCTestCase {
         var json: JSON = .array([1, 2, 3])
         json.remove(["key"])
 
-        XCTAssertTrue(json.isArray)
-        XCTAssertEqual(json.arrayValue?.count, 3)
+        XCTAssertTrue(json.isArray())
+        XCTAssertEqual(json.asArray()?.count, 3)
 
         json = json.removeKey("0")
 
-        XCTAssertTrue(json.isArray)
-        XCTAssertEqual(json.arrayValue?.count, 3)
+        XCTAssertTrue(json.isArray())
+        XCTAssertEqual(json.asArray()?.count, 3)
     }
 
     func testRemoveWithEmptyPath() {
         var json: JSON = ["name": "John"]
         json.remove([])
 
-        XCTAssertEqual(json["name"].stringValue, "John")
+        XCTAssertEqual(json["name"].asString(), "John")
     }
 
     func testRemoveNonExistentKey() {
         var json: JSON = ["name": "John"]
         json.remove(["age"])
 
-        XCTAssertEqual(json.objectValue?.count, 1)
-        XCTAssertEqual(json["name"].stringValue, "John")
+        XCTAssertEqual(json.asObject()?.count, 1)
+        XCTAssertEqual(json["name"].asString(), "John")
     }
 
     func testRemoveFromNullValue() {
@@ -81,8 +83,8 @@ final class JSONRemoveTests: XCTestCase {
 
         json.remove(["user", "profile", "email"])
 
-        XCTAssertEqual(json["user"]["name"].stringValue, "John")
-        XCTAssertEqual(json.objectValue?.count, 1)
+        XCTAssertEqual(json["user"]["name"].asString(), "John")
+        XCTAssertEqual(json.asObject()?.count, 1)
     }
 
     func testRemoveAllNestedContent() {

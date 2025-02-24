@@ -39,7 +39,7 @@ extension String: JSONRepresentable {
     
     /// See `LosslessJSONConvertible.init(json:)`.
     public init?(json: JSON) {
-        guard let string = json.stringValue else { return nil }
+        guard let string = json.asString() else { return nil }
         self = string
     }
 }
@@ -72,7 +72,7 @@ extension Bool: JSONRepresentable {
     
     /// See `LosslessJSONConvertible.init(json:)`.
     public init?(json: JSON) {
-        guard let string = json.boolValue else { return nil }
+        guard let string = json.asBool() else { return nil }
         self = string
     }
 }
