@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  JSON+Extensions.swift
 //
 //
 //  Created by Nicholas Trienens on 10/26/23.
@@ -7,31 +7,30 @@
 
 import Foundation
 
-extension JSON {
-    
-    public var optional: Optional<JSON> {
+public extension JSON {
+    var optional: Optional<JSON> {
         switch self {
-        case .null: return nil
-        default: return self
+        case .null: nil
+        default: self
         }
     }
-    
-    public func removingEmptyArrays() -> JSON {
+
+    func removingEmptyArrays() -> JSON {
         switch self {
-        case .array(let arr):
+        case let .array(arr):
             var newArray: [JSON] = []
             for value in arr {
-                if case .array(let innerArray) = value, innerArray.isEmpty {
+                if case let .array(innerArray) = value, innerArray.isEmpty {
                     continue
                 } else {
                     newArray.append(value.removingEmptyArrays())
                 }
             }
             return .array(newArray)
-        case .object(let obj):
+        case let .object(obj):
             var newObject: [String: JSON] = [:]
             for (key, value) in obj {
-                if case .array(let innerArray) = value, innerArray.isEmpty {
+                if case let .array(innerArray) = value, innerArray.isEmpty {
                     continue
                 } else {
                     newObject[key] = value.removingEmptyArrays()
@@ -44,51 +43,48 @@ extension JSON {
     }
 }
 
-extension Array where Element == JSON {
-    public func removeEmptyArraysDeep() -> [JSON] {
+public extension [JSON] {
+    func removingEmptyArrays() -> [JSON] {
         map { json -> JSON in
             return json.removingEmptyArrays()
         }
     }
 }
 
-
-extension JSON {
-   public var fuzzyFloat: Double {
+public extension JSON {
+    var fuzzyFloat: Double {
         switch self {
-        case .double(let number):
-            return number
-            
+        case let .double(number):
+            number
+
         default:
-            return 0
+            0
         }
     }
-    
-    public init( array: [JSON]) {
+
+    init(array: [JSON]) {
         self = .array(array)
     }
 }
-    
 
-public extension Array where Element == JSON {
-//    
+public extension [JSON] {
+//
 //    func removeKey(_ key: String) -> JSON {
 //        var json = JSON(self)
 //        json = json.removeKey(key)
 //        return json
 //    }
-    
+
     func transformed(using mapping: [String: String]) -> [JSON] {
-        return self.map { jsonElement in
+        map { jsonElement in
             jsonElement.transformed(using: mapping)
         }
     }
 }
 
-
 public extension JSON {
-    
-    @inlinable func map<T>(_ transform: (JSON) throws -> T) rethrows -> [T] {
+    @inlinable
+    func map<T>(_ transform: (JSON) throws -> T) rethrows -> [T] {
         switch self {
         case let .array(jsonList):
             return try jsonList.map(transform)
@@ -96,29 +92,30 @@ public extension JSON {
         }
         return []
     }
-    
-    @inlinable func map<T>(_ transform: (JSON) throws -> T) rethrows -> JSON {
-        switch self {
-        case let .array(jsonList):
-            return try JSON(jsonList.map(transform))
-        default: break
-        }
-        return JSON([])
-    }
-    
+
+//    @inlinable
+//    func map(_ transform: (JSON) throws -> some Any) rethrows -> JSON {
+//        switch self {
+//        case let .array(jsonList):
+//            return try JSON(jsonList.map(transform))
+//        default: break
+//        }
+//        return JSON([])
+//    }
+
     func transformed(using mapping: [String: String]) -> JSON {
         switch self {
         case let .array(jsonList):
             return JSON(jsonList.transformed(using: mapping))
         default: break
         }
-        
+
         var resultObject: [String: JSON] = [:]
-        
+
         for (key, path) in mapping {
             var values: [JSON] = []
-            
-            let value = self.get(path.components(separatedBy: "."))
+
+            let value = get(path.components(separatedBy: "."))
             if value.optional != nil {
                 values.append(value)
             }
@@ -134,13 +131,13 @@ public extension JSON {
     mutating func removingKey(_ key: String) {
         removeKey(key, from: &self)
     }
-    
+
     func removeKey(_ key: String) -> JSON {
         var json = self
         removeKey(key, from: &json)
         return json
     }
-    
+
     func removeKey(_ key: String, from json: inout JSON) {
         // If the JSON is an object, check each key
         if let object = json.asObject() {

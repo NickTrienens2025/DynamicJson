@@ -8,8 +8,8 @@ final class JSONSearchTests: XCTestCase {
             "age": .integer(30),
             "address": .object([
                 "street": .string("123 Main St"),
-                "city": .string("name"),  // same key as root level
-                "zip": .integer(12345),
+                "city": .string("name"), // same key as root level
+                "zip": .integer(12_345),
             ]),
             "contacts": .array([
                 .object(["name": .string("Alice"), "phone": .string("123-456-7890")]),
@@ -44,12 +44,12 @@ final class JSONSearchTests: XCTestCase {
                 ["id": 3, "value": 300],
             ],
             "metadata": [
-                "total": 600
+                "total": 600,
             ],
         ])
 
         // Find first node where value > 150
-        let firstLargeValue = json.findFirstNode { key, value in
+        let firstLargeValue = json.findFirstNode { _, value in
             if let num = value.asInt() {
                 return num > 150
             }
@@ -84,7 +84,7 @@ final class JSONSearchTests: XCTestCase {
         ])
 
         // Find all nodes with true values
-        let inStockNodes = json.findNodes { key, value in
+        let inStockNodes = json.findNodes { _, value in
             value == .boolean(true)
         }
 
@@ -123,8 +123,8 @@ final class JSONSearchTests: XCTestCase {
         // Test parent references
         let nested = JSON.object([
             "parent": .object([
-                "child": .string("value")
-            ])
+                "child": .string("value"),
+            ]),
         ])
 
         let childNodes = nested.findNodes(withKey: "child")

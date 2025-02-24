@@ -15,7 +15,7 @@ final class JSONRemoveTests: XCTestCase {
 
         XCTAssertEqual(json.asObject()?.count, 1)
         XCTAssertEqual(json["name"], JSON.null)
-        
+
         XCTAssertEqual(json.age.asInt(), 30)
         XCTAssertEqual(json["age"].asInt(), 30)
     }
@@ -26,14 +26,14 @@ final class JSONRemoveTests: XCTestCase {
                 "profile": [
                     "name": "John",
                     "email": "john@example.com",
-                ]
-            ]
+                ],
+            ],
         ]
 
         json.remove(["user", "profile", "email"])
 
-        print( json.jsonString)
-        
+        print(json.jsonString)
+
         XCTAssertNotNil(json["user"]["profile"])
         XCTAssertEqual(json["user"]["profile"]["name"].asString(), "John")
         XCTAssertEqual(json["user"]["profile"]["email"], JSON.null)
@@ -77,8 +77,8 @@ final class JSONRemoveTests: XCTestCase {
     func testRemoveNestedNonExistentPath() {
         var json: JSON = [
             "user": [
-                "name": "John"
-            ]
+                "name": "John",
+            ],
         ]
 
         json.remove(["user", "profile", "email"])
@@ -93,8 +93,8 @@ final class JSONRemoveTests: XCTestCase {
                 "profile": [
                     "name": "John",
                     "email": "john@example.com",
-                ]
-            ]
+                ],
+            ],
         ]
 
         json.remove(["user", "profile"])

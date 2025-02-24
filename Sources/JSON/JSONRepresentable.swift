@@ -1,5 +1,5 @@
 //
-//  composed.swift
+//  JSONRepresentable.swift
 //  JSON
 //
 //  Created by Nick Trienens on 1/19/25.
@@ -7,23 +7,20 @@
 
 /// A type that can be converted to a `JSON` instance without any loss or errors.
 public protocol JSONRepresentable {
-    
     /// The `JSON` representation of the instance.
     ///
     ///     42.json // JSON.number(Number.int(42))
     var json: JSON { get }
-    
-    init?(json: JSON)
 
+    init?(json: JSON)
 }
 
 extension JSON: JSONRepresentable {
-    
     /// See `SafeJSONRepresentable.json`.
     public var json: JSON {
-        return self
+        self
     }
-    
+
     /// See `LosslessJSONConvertible.init(json:)`.
     public init?(json: JSON) {
         self = json
@@ -31,12 +28,11 @@ extension JSON: JSONRepresentable {
 }
 
 extension String: JSONRepresentable {
-    
     /// See `SafeJSONRepresentable.json`.
     public var json: JSON {
-        return .string(self)
+        .string(self)
     }
-    
+
     /// See `LosslessJSONConvertible.init(json:)`.
     public init?(json: JSON) {
         guard let string = json.asString() else { return nil }
@@ -45,15 +41,14 @@ extension String: JSONRepresentable {
 }
 
 extension Optional: JSONRepresentable where Wrapped: JSONRepresentable {
-    
     /// See `SafeJSONRepresentable.json`.
     public var json: JSON {
         switch self {
-        case .none: return .null
-        case let .some(value): return value.json
+        case .none: .null
+        case let .some(value): value.json
         }
     }
-    
+
     /// See `LosslessJSONConvertible.init(json:)`.
     public init?(json: JSON) {
         switch json {
@@ -64,12 +59,11 @@ extension Optional: JSONRepresentable where Wrapped: JSONRepresentable {
 }
 
 extension Bool: JSONRepresentable {
-    
     /// See `SafeJSONRepresentable.json`.
     public var json: JSON {
-        return .boolean(self)
+        .boolean(self)
     }
-    
+
     /// See `LosslessJSONConvertible.init(json:)`.
     public init?(json: JSON) {
         guard let string = json.asBool() else { return nil }

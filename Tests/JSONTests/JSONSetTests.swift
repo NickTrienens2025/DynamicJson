@@ -8,9 +8,9 @@ final class JSONSetTests: XCTestCase {
                 "name": "John",
                 "age": 30,
                 "address": [
-                    "city": "New York"
+                    "city": "New York",
                 ],
-            ]
+            ],
         ]
 
         // Test setting nested value with path
@@ -36,9 +36,9 @@ final class JSONSetTests: XCTestCase {
         var json: JSON = [
             "user": [
                 "profile": [
-                    "name": "John"
-                ]
-            ]
+                    "name": "John",
+                ],
+            ],
         ]
 
         // Test setting with subscript
@@ -61,7 +61,7 @@ final class JSONSetTests: XCTestCase {
             "config": [
                 "version": 1,
                 "features": ["a", "b", "c"],
-            ]
+            ],
         ]
 
         // Test setting object values
@@ -74,9 +74,9 @@ final class JSONSetTests: XCTestCase {
 
         // Test setting new key in existing object
         print(json["config"])
-        
+
         json["config"]["features"] = .null
-        
+
         json["config"]["newKey"] = true
         print(json.config.newKey.boolValue)
         print(json["config"]["newKey"].asBool())

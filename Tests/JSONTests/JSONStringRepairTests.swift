@@ -1,5 +1,5 @@
 //
-//  Untitled.swift
+//  JSONStringRepairTests.swift
 //  JSON
 //
 //  Created by Nick Trienens on 1/19/25.
@@ -13,19 +13,19 @@ final class JSONRepairTests: XCTestCase {
         let string = """
         kjashdfjlkhasdjkf
         ```json
-        
+
         [ 
         1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 
         ]
-        
+
         ```
         """
         let test = JSONStringRepair.removeComments(from: string)
         print(test)
         let json = try JSONStringRepair.createJson(from: test)
-        print( json)
+        print(json)
     }
-    
+
     func testRepairTicks() throws {
         let string = """
         ```json
@@ -37,9 +37,9 @@ final class JSONRepairTests: XCTestCase {
         let test = JSONStringRepair.removeComments(from: string)
         print(test)
         let json = try JSONStringRepair.createJson(from: test)
-        print( json)
+        print(json)
     }
-    
+
     func testRepairTicks2() throws {
         let string = """
         ```json
@@ -50,6 +50,6 @@ final class JSONRepairTests: XCTestCase {
         let test = JSONStringRepair.removeComments(from: string)
         print(test)
         let json = try JSONStringRepair.createJson(from: test)
-        print( json)
+        print(json)
     }
 }

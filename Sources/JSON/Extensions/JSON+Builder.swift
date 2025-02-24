@@ -24,27 +24,28 @@ public func json(@JSONBuilder conditions makeResult: () throws -> JSON) rethrows
 }
 
 // Extension to JSON struct to initialize it with a JSONBuilder.
-extension JSON {
-    public init(@JSONBuilder statements: () -> JSON) {
+public extension JSON {
+    init(@JSONBuilder statements: () -> JSON) {
         self = statements()
     }
 
-    public init(_ array: [JSON]) {
+    init(_ array: [JSON]) {
         self = .array(array)
     }
 
-    public init(_ string: String.SubSequence) {
+    init(_ string: String.SubSequence) {
         self = .string(string.asString)
     }
 
-    public init(_ dictionary: [String: JSONRepresentable]) {
+    init(_ dictionary: [String: JSONRepresentable]) {
         self = .object(dictionary.mapValues { $0.json })
     }
 }
 
 // JSONBuilder is a Swift result builder utilizing the new @resultBuilder directive in Swift.
 // It allows the creation of JSON structures using Swift syntax.
-// It supports JSON objects, JSON arrays, strings, numbers (Int, Float, Double), booleans and `null` JSON values.
+// It supports JSON objects, JSON arrays, strings, numbers (Int, Float, Double), booleans and
+// `null` JSON values.
 @resultBuilder
 public enum JSONBuilder {
     public static func buildBlock(_ components: JSON...) -> JSON {
@@ -62,7 +63,8 @@ public enum JSONBuilder {
         .object(
             expression.mapValues { value in
                 value.json
-            })
+            }
+        )
     }
 
     public static func buildFinalResult(_ component: JSON) -> JSON {
@@ -109,28 +111,32 @@ public enum JSONBuilder {
         .object(
             expression.mapValues { value in
                 JSON.string(value)
-            })
+            }
+        )
     }
 
     public static func buildExpression(_ expression: [String: Int]) -> JSON {
         .object(
             expression.mapValues { value in
                 JSON.integer(value)
-            })
+            }
+        )
     }
 
     public static func buildExpression(_ expression: [String: Double]) -> JSON {
         .object(
             expression.mapValues { value in
                 JSON.double(value)
-            })
+            }
+        )
     }
 
     public static func buildExpression(_ expression: [String: Float]) -> JSON {
         .object(
             expression.mapValues { value in
                 JSON.double(Double(value))
-            })
+            }
+        )
     }
 
     //    public static func buildExpression(_ expression: [String: Decimal]) -> JSON {
@@ -143,6 +149,7 @@ public enum JSONBuilder {
         .object(
             expression.mapValues { value in
                 JSON.boolean(value)
-            })
+            }
+        )
     }
 }

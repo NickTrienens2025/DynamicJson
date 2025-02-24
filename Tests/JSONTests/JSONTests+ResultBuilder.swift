@@ -1,5 +1,5 @@
 //
-//  ResultBuilderJSONTests.swift
+//  JSONTests+ResultBuilder.swift
 //  JSON
 //
 //  Created by Nick Trienens on 1/19/25.
@@ -63,7 +63,7 @@ final class ResultBuilderJSONTests: XCTestCase {
                         "item1"
                         "item2"
                     },
-                ]
+                ],
             ]
         }
 
@@ -71,7 +71,6 @@ final class ResultBuilderJSONTests: XCTestCase {
         XCTAssertEqual(json["outer"]["array"][0].asString(), "item1")
         XCTAssertEqual(json["outer"]["array"][1].asString(), "item2")
         XCTAssertNil(json["outer"]["array"][3].asString())
-
     }
 
     func testOptionalHandling() throws {
@@ -107,10 +106,10 @@ final class ResultBuilderJSONTests: XCTestCase {
     }
 
     func testDictionaryInitialization() throws {
-        let stringDict: [String: String] = ["key": "value"]
-        let intDict: [String: Int] = ["key": 42]
-        let doubleDict: [String: Double] = ["key": 3.14]
-        let boolDict: [String: Bool] = ["key": true]
+        let stringDict = ["key": "value"]
+        let intDict = ["key": 42]
+        let doubleDict = ["key": 3.14]
+        let boolDict = ["key": true]
 
         let json = JSON {
             stringDict

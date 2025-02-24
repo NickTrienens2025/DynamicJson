@@ -2,7 +2,6 @@ import JSON
 import XCTest
 
 final class DictionaryJSONTests: XCTestCase {
-    
     func testEquality() throws {
         let original: [String: JSON] = [
             "one": 1.4,
@@ -15,13 +14,12 @@ final class DictionaryJSONTests: XCTestCase {
             "tru": true,
         ]
         XCTAssertEqual(JSON(original).asJsonString(), JSON(original2).asJsonString())
-        
+
         XCTAssertTrue(original == original2)
-        
+
         XCTAssertEqual(original, original2)
-        
     }
-    
+
     func testValueForKey() throws {
         let original: [String: JSON] = [
             "one": 1,
@@ -44,16 +42,16 @@ final class DictionaryJSONTests: XCTestCase {
         XCTAssertEqual(JSON(original).asJsonString(), json.asJsonString())
 //        let dict = try XCTUnwrap(json.dictionaryValue)
         print(json.asJsonString())
-        
+
         json.two = 2
         print(json["two"])
         print(json.two)
         json.two = JSON(original)
-        
+
         print(json.two)
         print(json.fals.1)
         print(json.jsonString)
-        
+
         XCTAssertEqual(1, json["one"].asInt())
         XCTAssertEqual(1, json["oneoh"].asInt())
         XCTAssertEqual(1, json["onenum"].asInt())

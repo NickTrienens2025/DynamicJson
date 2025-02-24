@@ -2,13 +2,12 @@ import JSON
 import XCTest
 
 final class JSONTests: XCTestCase {
-
     func testGetSubscript() throws {
         let object: JSON = [
             "one": 1,
             "bool": true,
             "dict": [
-                "key": "value"
+                "key": "value",
             ],
         ]
         XCTAssertEqual("value", object["dict"]["key"].asString())
@@ -29,13 +28,12 @@ final class JSONTests: XCTestCase {
         XCTAssertTrue(array[0] == "one")
         XCTAssertEqual(array[1].asInt(), 2)
         XCTAssertTrue(array[2] == false)
-        XCTAssertEqual(array[3], JSON.null )
+        XCTAssertEqual(array[3], JSON.null)
 
         let string: JSON = .string("text")
         XCTAssertEqual(string["text"], JSON.null)
-        
-        
-        let objectDescription: JSON = ["description" : "Hello, world!"]
+
+        let objectDescription: JSON = ["description": "Hello, world!"]
         XCTAssertEqual(objectDescription.description, #"{"description":"Hello, world!"}"#)
         XCTAssertEqual(objectDescription["description"], "Hello, world!")
     }
@@ -45,16 +43,17 @@ final class JSONTests: XCTestCase {
             "one": 1,
             "bool": true,
             "dict": [
-                "test": "value"
+                "test": "value",
             ],
             "array": ["ine", "two", "three"],
         ]
 
         let g = JSON(
             object.array.map { j in
-                var updatedJson: JSON = JSON(["test": j])
+                var updatedJson = JSON(["test": j])
                 return updatedJson
-            })
+            }
+        )
         print(g.jsonString)
 
         let j = object.removeKey("test")
@@ -62,7 +61,6 @@ final class JSONTests: XCTestCase {
 
         object.removingKey("test")
         print(object.jsonString)
-
     }
 
     func testSetSubscript() throws {
@@ -70,7 +68,7 @@ final class JSONTests: XCTestCase {
             "one": 1,
             "bool": true,
             "dict": [
-                "key": "value"
+                "key": "value",
             ],
         ]
 
@@ -97,13 +95,13 @@ final class JSONTests: XCTestCase {
     }
 
     func testOptionalSpecializedValues() throws {
-        let arr: JSON = JSON(["one", 123, 1.23])
+        let arr = JSON(["one", 123, 1.23])
         XCTAssertEqual(3, arr.asArray()?.count)
         XCTAssertEqual("one", arr[0].asString())
         XCTAssertEqual(123, arr[1].asInt())
         XCTAssertEqual(1.23, arr[2].asDouble())
 
-        let dict: JSON = JSON(["one": "one", "two": 1.23])
+        let dict = JSON(["one": "one", "two": 1.23])
         XCTAssertEqual(2, dict.asObject()?.count)
         XCTAssertEqual("one", dict["one"].asString())
         XCTAssertEqual(1.23, dict["two"].asDouble())
@@ -131,7 +129,7 @@ final class JSONTests: XCTestCase {
         XCTAssertFalse(JSON.double(0) as JSON? == false)
         XCTAssertFalse(JSON.double(1) as JSON? == true)
 
-        let dict: JSON = JSON(["one": "one", "two": 1.23])
+        let dict = JSON(["one": "one", "two": 1.23])
         XCTAssertTrue(dict == JSON(["one": "one", "two": 1.23]))
         XCTAssertTrue(JSON(["one": "one", "two": 1.23]) == dict)
         XCTAssertTrue(dict["one"] == "one")
@@ -162,8 +160,8 @@ final class JSONTests: XCTestCase {
                     "index_0",
                     false,
                     4.20,
-                ]
-            ]
+                ],
+            ],
         ]
 
         let encoded = try JSONEncoder().encode(json)
@@ -249,7 +247,6 @@ final class JSONTests: XCTestCase {
 
         let null: JSON = nil
         XCTAssertFalse(null.isArray())
-
     }
 
     func testIsObject() throws {
@@ -270,6 +267,5 @@ final class JSONTests: XCTestCase {
 
         let null: JSON = nil
         XCTAssertFalse(null.isObject())
-
     }
 }

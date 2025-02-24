@@ -1,11 +1,17 @@
 import Foundation
 
 /// This type nests and uses subscripts and dynamic member look up to traverse a JSON structure
-/// since we are using @dynamicMemberLookup datalookup will happen on .properties or subscripts while any action will be a function on this type, this helps understand the difference between methods and data access, the big exception is `.description` returns the CustomStringConvertible value for debugging, if you need to get a property with the name "description" use a subscript
+/// since we are using @dynamicMemberLookup datalookup will happen on .properties or subscripts
+/// while any action will be a function on this type, this helps understand the difference
+/// between methods and data access, the big exception is `.description` returns the
+/// CustomStringConvertible value for debugging, if you need to get a property with the name
+/// "description" use a subscript
 ///
 /// let objectDescription: JSON = ["description" : "Hello, world!"]
-/// ❌  objectDescription.description      XCTAssertEqual(objectDescription.description, #"{"description":"Hello, world!"}"#)
-/// ✔️objectDescription["description"] XCTAssertEqual(objectDescription["description"], "Hello, world!")
+/// ❌  objectDescription.description      XCTAssertEqual(objectDescription.description,
+/// #"{"description":"Hello, world!"}"#)
+/// ✔️objectDescription["description"] XCTAssertEqual(objectDescription["description"], "Hello,
+/// world!")
 ///
 ///
 @dynamicMemberLookup
@@ -31,12 +37,15 @@ public enum JSON:
     }
 
     // MARK: - Dynamic Member Access
+
     /// Gets the JSON value for a given key.
     ///
-    /// - Complexity: _O(n)_, where _n_ is the number of elements in the JSON array you are accessing object values from.
+    /// - Complexity: _O(n)_, where _n_ is the number of elements in the JSON array you are
+    /// accessing object values from.
     ///   More often though, you are accessing object values via key, and that is _O(1)_.
     ///
-    /// Most of the time, the member passed in with be a `String` key. This will get a value for an object key:
+    /// Most of the time, the member passed in with be a `String` key. This will get a value for
+    /// an object key:
     ///
     ///     json.user.first_name // .string("Tanner")
     ///
@@ -44,17 +53,20 @@ public enum JSON:
     ///
     ///     json.users.0.age // .number(.int(42))
     ///
-    /// - Parameter member: The key for JSON objects or index for JSON arrays of the value to get.
+    /// - Parameter member: The key for JSON objects or index for JSON arrays of the value to
+    /// get.
     ///
-    /// - Returns: The JSON value for the given key or index. `.null` is returned if the value is not found or
-    ///   the JSON value this subscript is called on does not have nested data, i.e. `.string`, `.bool`, etc.
+    /// - Returns: The JSON value for the given key or index. `.null` is returned if the value
+    /// is not found or
+    ///   the JSON value this subscript is called on does not have nested data, i.e. `.string`,
+    /// `.bool`, etc.
     public subscript(dynamicMember member: String) -> JSON {
         get {
             switch self {
             case let .object(object):
                 return object[member] ?? .null
             case let .array(array) where Int(member) != nil:
-                guard let index = Int(member), index >= array.startIndex && index < array.endIndex
+                guard let index = Int(member), index >= array.startIndex, index < array.endIndex
                 else { return .null }
                 return array[index]
             default: return .null
@@ -75,6 +87,7 @@ public enum JSON:
     }
 
     // MARK: - Subscript
+
     public subscript(key: String) -> JSON {
         get {
             guard case let .object(dict) = self else { return nil }
@@ -114,11 +127,11 @@ public enum JSON:
     /// - Returns: Thw JSON value(s) found at the path passed in. You will get a `.null` case
     ///   if no JSON is found at the given path.
     public func get(_ path: [String]) -> JSON {
-        return path.reduce(self) { json, key in
+        path.reduce(self) { json, key in
             switch json {
             case let .object(object): return object[key] ?? .null
             case let .array(array) where Int(key) != nil:
-                guard let index = Int(key), index >= array.startIndex && index < array.endIndex
+                guard let index = Int(key), index >= array.startIndex, index < array.endIndex
                 else { return .null }
                 return array[index]
             default: return .null
@@ -134,8 +147,7 @@ public enum JSON:
     /// - Parameters:
     ///   - path: The path of the value to set.
     ///   - json: The JSON value to set the index or key to.
-    public mutating func set<Path>(_ path: Path, to json: JSON)
-    where Path: Collection, Path.Element == String {
+    public mutating func set(_ path: some Collection<String>, to json: JSON) {
         if let key = path.first {
             switch self {
             case var .object(object):
@@ -162,7 +174,8 @@ public enum JSON:
 
     /// Removes a key/value pair from an object at a given path.
     ///
-    /// The `JSON` type converts `nil` to it's `.null` case, so if you try to remove a value like this:
+    /// The `JSON` type converts `nil` to it's `.null` case, so if you try to remove a value
+    /// like this:
     ///
     ///     json["foo", "bar"] = nil
     ///
@@ -174,7 +187,8 @@ public enum JSON:
     ///         }
     ///     }
     ///
-    /// To actually remove a property from an object, you use `.remove(_:)` with the path to the property to remove:
+    /// To actually remove a property from an object, you use `.remove(_:)` with the path to the
+    /// property to remove:
     ///
     ///     json.remove(["foo", "bar"])
     ///
@@ -189,10 +203,9 @@ public enum JSON:
     /// - Complexity: _O(n)_, where _n_ is the number of elements in the path to remove.
     ///   Keep in mind that this method is recursive, so each succesive eleemnt in the path will
     ///   add another call to the stack.
-    public mutating func remove<Path>(_ path: Path) where Path: Collection, Path.Element == String {
+    public mutating func remove(_ path: some Collection<String>) {
         guard path.count > 0 else { return }
         if let key = path.first {
-
             guard var object = self.asObject() else { return }
 
             if path.count == 1 {
@@ -214,20 +227,21 @@ public enum JSON:
     /// `JSONSerialization.data(withJSONObject:options:)`.
     public func asArray() -> [JSON]? {
         switch self {
-        case .array(let double):
-            return double
+        case let .array(double):
+            double
         default:
-            return nil
+            nil
         }
     }
+
     /// Returns a `Bool` representation of the receiver if the
     /// underlying type is `.boolean`, otherwise `nil`.
     public func asBool() -> Bool? {
         switch self {
-        case .boolean(let value):
-            return value
+        case let .boolean(value):
+            value
         default:
-            return nil
+            nil
         }
     }
 
@@ -235,12 +249,12 @@ public enum JSON:
     /// underlying type is `.number`, otherwise `nil`.
     public func asDouble() -> Double? {
         switch self {
-        case .double(let double):
-            return double
-        case .integer(let int):
-            return Double(int)
+        case let .double(double):
+            double
+        case let .integer(int):
+            Double(int)
         default:
-            return nil
+            nil
         }
     }
 
@@ -249,10 +263,10 @@ public enum JSON:
     /// `JSONSerialization.data(withJSONObject:options:)`.
     public func asObject() -> [String: JSON]? {
         switch self {
-        case .object(let double):
-            return double
+        case let .object(double):
+            double
         default:
-            return nil
+            nil
         }
     }
 
@@ -260,22 +274,23 @@ public enum JSON:
     /// underlying type is `.number`, otherwise `nil`.
     public func asInt() -> Int? {
         switch self {
-        case .double(let double):
-            return Int(double)
-        case .integer(let int):
-            return int
+        case let .double(double):
+            Int(double)
+        case let .integer(int):
+            int
         default:
-            return nil
+            nil
         }
     }
+
     /// Returns a `String` representation of the receiver if the
     /// underlying type is `.string`, otherwise `nil`.
     public func asString() -> String? {
         switch self {
-        case .string(let value):
-            return value
+        case let .string(value):
+            value
         default:
-            return nil
+            nil
         }
     }
 
@@ -328,7 +343,7 @@ public enum JSON:
         case let .integer(number): return "\(number)"
         case let .boolean(bool): return bool.description
         case let .array(array):
-            return "[" + array.map { $0.description }.joined(separator: ",") + "]"
+            return "[" + array.map(\.description).joined(separator: ",") + "]"
         case let .object(object):
             let data = object.map { "\"" + $0.key + "\":" + $0.value.description }.joined(
                 separator: ",")
@@ -336,7 +351,8 @@ public enum JSON:
         }
     }
 
-    // MARK:  - Conversions
+    // MARK: - Conversions
+
     public func asJsonString() -> String {
         let encoder = JSONEncoder()
         if #available(macOS 10.15, *) {
@@ -345,7 +361,7 @@ public enum JSON:
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         }
         if let data = try? encoder.encode(self),
-            let jString = String(data: data, encoding: .utf8)
+           let jString = String(data: data, encoding: .utf8)
         {
             return jString
         } else {
@@ -364,7 +380,8 @@ public enum JSON:
     }
 }
 
-// MARK:  - ExpressibleByLiteral
+// MARK: - ExpressibleByLiteral
+
 extension JSON:
     ExpressibleByArrayLiteral,
     ExpressibleByBooleanLiteral,
@@ -421,6 +438,7 @@ extension JSON:
 }
 
 // MARK: - Equatable
+
 extension JSON: Equatable {
     public static func == (_ arg1: JSON, _ arg2: JSON) -> Bool {
         switch (arg1, arg2) {
@@ -440,7 +458,7 @@ extension JSON: Equatable {
 
         case let (.integer(one), .integer(two)):
             return one == two
-            
+
         case (.null, .null):
             return true
 
@@ -527,8 +545,8 @@ extension [String: Any?] {
     }
 }
 
-extension Any? {
-    fileprivate var json: JSON? {
+private extension Any? {
+    var json: JSON? {
         guard case let .some(element) = self else { return .null }
 
         switch element {
