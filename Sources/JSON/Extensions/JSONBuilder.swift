@@ -117,7 +117,7 @@ public enum JSONBuilder {
 
     public static func buildExpression(_ expression: [String: Int]) -> JSON {
         .object(expression.mapValues { value in
-            JSON.double(Double(value))
+            JSON.integer(value)
         })
     }
 

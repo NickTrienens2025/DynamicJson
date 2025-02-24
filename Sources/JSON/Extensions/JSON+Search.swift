@@ -15,7 +15,7 @@ public struct JSONNodeWithPath {
 
 public extension JSON {
     
-    func findNodes(forKey key: String, path: [String] = [], parent: JSON? = nil) -> [JSONNodeWithPath] {
+    func findNodes(withKey key: String, path: [String] = [], parent: JSON? = nil) -> [JSONNodeWithPath] {
         var results: [JSONNodeWithPath] = []
         switch self {
         case .null, .boolean, .string, .double, .integer:
@@ -23,7 +23,7 @@ public extension JSON {
         case .array(let array):
             for (index, child) in array.enumerated() {
                 let childPath = path + [String(index)]
-                let childResults = child.findNodes(forKey: key, path: childPath, parent: self)
+                let childResults = child.findNodes(withKey: key, path: childPath, parent: self)
                 results.append(contentsOf: childResults)
             }
         case .object(let object):
@@ -33,7 +33,7 @@ public extension JSON {
                     let matchingNode = JSONNodeWithPath(path: childPath, value: child, parent: self)
                     results.append(matchingNode)
                 }
-                let childResults = child.findNodes(forKey: key, path: childPath, parent: self)
+                let childResults = child.findNodes(withKey: key, path: childPath, parent: self)
                 results.append(contentsOf: childResults)
             }
         }

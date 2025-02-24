@@ -1,8 +1,13 @@
 import Foundation
 
-// This type nests and uses subscripts and dynamic member look up to traverse a JSON structure
-// since we are using @dynamicMemberLookup datalookup will happen on .properties or subscripts while any action will be a function on this type, this helps understand the difference between methods and data access
-
+/// This type nests and uses subscripts and dynamic member look up to traverse a JSON structure
+/// since we are using @dynamicMemberLookup datalookup will happen on .properties or subscripts while any action will be a function on this type, this helps understand the difference between methods and data access, the big exception is `.description` returns the CustomStringConvertible value for debugging, if you need to get a property with the name "description" use a subscript
+///
+/// let objectDescription: JSON = ["description" : "Hello, world!"]
+/// ❌  objectDescription.description      XCTAssertEqual(objectDescription.description, #"{"description":"Hello, world!"}"#)
+/// ✔️objectDescription["description"] XCTAssertEqual(objectDescription["description"], "Hello, world!")
+///
+///
 @dynamicMemberLookup
 public enum JSON:
     Hashable,
@@ -10,12 +15,12 @@ public enum JSON:
     Sendable
 {
     indirect case array([JSON])
-    case boolean(Bool)
     indirect case object([String: JSON])
+    case string(String)
     case double(Double)
     case integer(Int)
+    case boolean(Bool)
     case null
-    case string(String)
 
     public init(_ array: [Any?]) {
         self = array.json

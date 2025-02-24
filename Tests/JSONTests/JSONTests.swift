@@ -32,8 +32,12 @@ final class JSONTests: XCTestCase {
         XCTAssertEqual(array[3], JSON.null )
 
         let string: JSON = .string("text")
-        //        XCTAssertNil(string["text"] as JSON?)
         XCTAssertEqual(string["text"], JSON.null)
+        
+        
+        let objectDescription: JSON = ["description" : "Hello, world!"]
+        XCTAssertEqual(objectDescription.description, #"{"description":"Hello, world!"}"#)
+        XCTAssertEqual(objectDescription["description"], "Hello, world!")
     }
 
     func testRemovals() throws {

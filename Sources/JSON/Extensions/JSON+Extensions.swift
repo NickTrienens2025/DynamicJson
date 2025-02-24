@@ -16,8 +16,6 @@ extension JSON {
         }
     }
     
-    
-    
     public func removingEmptyArrays() -> JSON {
         switch self {
         case .array(let arr):
