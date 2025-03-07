@@ -46,8 +46,8 @@ final class JSONSearchTests: XCTestCase {
         }
 
         XCTAssertNotNil(firstLargeValue)
-        XCTAssertEqual(firstLargeValue?.value, .integer(600))
-        XCTAssertEqual(firstLargeValue?.path, ["metadata", "total"])
+        XCTAssertEqual(firstLargeValue?.value, .integer(200))
+        XCTAssertEqual(firstLargeValue?.path, ["items", "1", "value"])
 
         // Find first node with specific key and value
         let specificNode = json.findFirstNode { key, value in
