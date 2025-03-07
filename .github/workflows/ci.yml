@@ -11,10 +11,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_16.1.app
-      - name: Install xcbeautify
-        run: brew install xcbeautify
       - name: Test
-        run: set -o pipefail && swift test --enable-test-discovery 2>&1 | xcbeautify --report junit --output test-results.xml
+        run: set -o pipefail && swift test --enable-test-discovery 2>&1 | xcbeautify --report junit --report-path test-results.xml
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
