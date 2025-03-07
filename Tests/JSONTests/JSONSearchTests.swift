@@ -42,10 +42,7 @@ final class JSONSearchTests: XCTestCase {
                 ["id": 1, "value": 100],
                 ["id": 2, "value": 200],
                 ["id": 3, "value": 300],
-            ],
-            "metadata": [
-                "total": 600,
-            ],
+            ]
         ])
 
         // Find first node where value > 150
