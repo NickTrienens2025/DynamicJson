@@ -132,7 +132,7 @@ final class ResultBuilderJSONTests: XCTestCase {
         XCTAssertEqual(result["key"].asString(), "value")
 
         // Test throwing version
-        let throwingResult = try json {
+        let throwingResult = json {
             ["key": "value"]
         }
 

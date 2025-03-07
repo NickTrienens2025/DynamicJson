@@ -73,14 +73,10 @@ final class JSONSetTests: XCTestCase {
         XCTAssertEqual(json["config"]["features"][1].asString(), "updated")
 
         // Test setting new key in existing object
-        print(json["config"])
-
         json["config"]["features"] = .null
 
         json["config"]["newKey"] = true
-        print(json.config.newKey.boolValue)
-        print(json["config"]["newKey"].asBool())
-        print(json.asJsonString())
+        
         if let value: Bool = json["config"]["newKey"].asBool() {
             XCTAssertEqual(value, true)
         }

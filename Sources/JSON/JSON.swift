@@ -18,8 +18,10 @@ import Foundation
 public enum JSON:
     Hashable,
     CustomStringConvertible,
-    Sendable
+    Sendable,
+    Comparable
 {
+    
     indirect case array([JSON])
     indirect case object([String: JSON])
     case string(String)
@@ -113,7 +115,7 @@ public enum JSON:
         }
     }
 
-    // Accessors
+    // MARK: - Accessors
 
     /// Gets the JSON at a given path.
     ///
@@ -219,16 +221,66 @@ public enum JSON:
             }
         }
     }
+    
+    // MARK: - Typed Comparable
+    public static func < (lhs: JSON, rhs: JSON) -> Bool {
+        switch (lhs, rhs) {
+        case (.null, _):
+            return false
+        case (_, .null):
+            return true
+        case (.string(let l), .string(let r)):
+            return l < r
+        case (.double(let l), .double(let r)):
+            return l < r
+        case (.integer(let l), .integer(let r)):
+            return l < r
+        case (.boolean(let l), .boolean(let r)):
+            return l == false && r == true
+        case (.array(let l), .array(let r)):
+            return l.lexicographicallyPrecedes(r)
+        case (.object(let l), .object(let r)):
+            return l.lexicographicallyPrecedes(r, by: { $0.key == $1.key ? $0.value < $1.value : $0.key < $1.key })
+        case (.string(let s), .integer(let i)):
+            if let num = Int(s) {
+                return num < i
+            }
+            return "\(lhs)" < "\(rhs)"
+        case (.integer(let i), .string(let s)):
+            if let num = Int(s) {
+                return i < num
+            }
+            return "\(lhs)" < "\(rhs)"
+        case (.string(let s), .double(let d)):
+            if let num = Double(s) {
+                return num < d
+            }
+            return "\(lhs)" < "\(rhs)"
+        case (.double(let d), .string(let s)):
+            if let num = Double(s) {
+                return d < num
+            }
+            return "\(lhs)" < "\(rhs)"
+        case (.integer(let i), .double(let d)):
+            return Double(i) < d
+        case (.double(let d), .integer(let i)):
+            return d < Double(i)
+        default:
+            // Sort by enum case order if types don't match
+            return "\(lhs)" < "\(rhs)"
+        }
+    }
+    
 
-    // Computed Varaiables
+    // MARK: - Typed Accessors
 
     /// Returns a `Array<Any>` representation of the receiver.
     /// The returned value is suitable for encoding as JSON via
     /// `JSONSerialization.data(withJSONObject:options:)`.
     public func asArray() -> [JSON]? {
         switch self {
-        case let .array(double):
-            double
+        case let .array(value):
+            value
         default:
             nil
         }
@@ -263,8 +315,8 @@ public enum JSON:
     /// `JSONSerialization.data(withJSONObject:options:)`.
     public func asObject() -> [String: JSON]? {
         switch self {
-        case let .object(double):
-            double
+        case let .object(value):
+            value
         default:
             nil
         }
@@ -345,8 +397,7 @@ public enum JSON:
         case let .array(array):
             return "[" + array.map(\.description).joined(separator: ",") + "]"
         case let .object(object):
-            let data = object.map { "\"" + $0.key + "\":" + $0.value.description }.joined(
-                separator: ",")
+            let data = object.map { "\"" + $0.key + "\":" + $0.value.description }.joined(separator: ",")
             return "{" + data + "}"
         }
     }
@@ -440,37 +491,60 @@ extension JSON:
 // MARK: - Equatable
 
 extension JSON: Equatable {
-    public static func == (_ arg1: JSON, _ arg2: JSON) -> Bool {
-        switch (arg1, arg2) {
-        case let (.array(one), .array(two)):
-            let value = one == two
-            return value
-
-        case let (.boolean(one), .boolean(two)):
-            return one == two
-
-        case let (.object(one), .object(two)):
-            let value = one == two
-            return value
-
-        case let (.double(one), .double(two)):
-            return one == two
-
-        case let (.integer(one), .integer(two)):
-            return one == two
-
+    public static func == (_ lhs: JSON, _ rhs: JSON) -> Bool {
+        switch (lhs, rhs) {
         case (.null, .null):
             return true
-
-        case let (.string(one), .string(two)):
-            return one == two
-
+            
+        case let (.boolean(l), .boolean(r)):
+            return l == r
+            
+        case let (.string(l), .string(r)):
+            return l == r
+            
+        case let (.double(l), .double(r)):
+            return l == r
+            
+        case let (.integer(l), .integer(r)):
+            return l == r
+            
+        case let (.array(l), .array(r)):
+            return l == r
+            
+        case let (.object(l), .object(r)):
+            return l == r
+            
+        // String to number conversions
+        case let (.string(s), .integer(i)):
+            guard let num = Int(s) else { return false }
+            return num == i
+            
+        case let (.integer(i), .string(s)):
+            guard let num = Int(s) else { return false }
+            return i == num
+            
+        case let (.string(s), .double(d)):
+            guard let num = Double(s) else { return false }
+            return num == d
+            
+        case let (.double(d), .string(s)):
+            guard let num = Double(s) else { return false }
+            return d == num
+            
+        // Integer and double conversions
+        case let (.integer(i), .double(d)):
+            return Double(i) == d
+            
+        case let (.double(d), .integer(i)):
+            return d == Double(i)
+            
         default:
             return false
         }
     }
 }
 
+// MARK: - Codable
 extension JSON: Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -525,6 +599,7 @@ extension JSON: Codable {
     }
 }
 
+// MARK - Any extensions
 extension [Any?] {
     var json: JSON {
         .array(compactMap(\.json))

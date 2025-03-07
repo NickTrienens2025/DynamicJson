@@ -50,17 +50,15 @@ final class JSONTests: XCTestCase {
 
         let g = JSON(
             object.array.map { j in
-                var updatedJson = JSON(["test": j])
+                let updatedJson = JSON(["test": j])
                 return updatedJson
             }
         )
-        print(g.jsonString)
-
         let j = object.removeKey("test")
-        print(j.jsonString)
+        XCTAssertEqual(j.test, JSON.null)
 
         object.removingKey("test")
-        print(object.jsonString)
+        XCTAssertEqual(object.test, JSON.null)
     }
 
     func testSetSubscript() throws {
