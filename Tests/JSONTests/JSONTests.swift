@@ -48,12 +48,6 @@ final class JSONTests: XCTestCase {
             "array": ["ine", "two", "three"],
         ]
 
-        let g = JSON(
-            object.array.map { j in
-                let updatedJson = JSON(["test": j])
-                return updatedJson
-            }
-        )
         let j = object.removeKey("test")
         XCTAssertEqual(j.test, JSON.null)
 
