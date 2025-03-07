@@ -11,15 +11,17 @@ jobs:
       - uses: actions/checkout@v4
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_16.1.app
+      - name: Generate Xcode Project
+        run: swift package generate-xcodeproj
       - name: Run Tests
         run: |
           mkdir -p test-output
-          swift test --enable-code-coverage 2>&1 | tee test-output/test.log
+          xcodebuild test -project *.xcodeproj -scheme $(ls *.xcodeproj/xcshareddata/xcschemes/*.xcscheme | head -1 | xargs basename -s .xcscheme) -enableCodeCoverage YES -resultBundlePath test-output/TestResults.xcresult
       - name: Process Test Results
         if: always()
         uses: kishikawakatsumi/xcresulttool@v1
         with:
-          path: test-output/test.log
+          path: test-output/TestResults.xcresult
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v4
