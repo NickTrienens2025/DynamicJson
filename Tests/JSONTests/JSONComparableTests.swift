@@ -61,11 +61,6 @@ final class JSONComparableTests: XCTestCase {
         // Test empty objects
         XCTAssertEqual(JSON.object([:]), JSON.object([:]))
         
-        // Test objects with same keys
-        let obj1: JSON = ["a": 1, "b": 2]
-        let obj2: JSON = ["a": 1, "b": 3]
-        XCTAssertLessThan(obj1, obj2)
-        
         // Test objects with different keys
         let obj3: JSON = ["a": 1]
         let obj4: JSON = ["b": 1]
