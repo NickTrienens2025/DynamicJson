@@ -345,6 +345,25 @@ public enum JSON:
             nil
         }
     }
+    
+    public func asStringDefaulting( to: String = "") -> String {
+        asString() ?? to
+    }
+    public func asIntDefaulting( to: Int = 0) -> Int {
+        asInt() ?? to
+    }
+    public func asObjectDefaulting( to: [String: JSON]) -> [String: JSON] {
+        asObject() ?? to
+    }
+    public func asArrayDefaulting( to: [JSON]) -> [JSON] {
+        asArray() ?? to
+    }
+    public func asDoubleDefaulting( to: Double = 0) -> Double {
+        asDouble() ?? to
+    }
+    public func asBoolDefaulting( to: Bool = true) -> Bool {
+        asBool() ?? to
+    }
 
     /// Returns `true` if the receiver is an array, otherwise `false`.
     public func isArray() -> Bool {

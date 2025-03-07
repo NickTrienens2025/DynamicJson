@@ -20,14 +20,6 @@ final class JSONSearchTests: XCTestCase {
         // Test finding all "name" nodes
         let nameNodes = json.findNodes(withKey: "name")
         XCTAssertEqual(nameNodes.count, 3)
-//        XCTAssertEqual(nameNodes[0].value, .string("John"))
-//        XCTAssertEqual(nameNodes[1].value, .string("Alice"))
-//        XCTAssertEqual(nameNodes[2].value, .string("Bob"))
-//
-//        // Test paths are correct
-//        XCTAssertEqual(nameNodes[0].path, ["name"])
-//        XCTAssertEqual(nameNodes[1].path, ["contacts", "0", "name"])
-//        XCTAssertEqual(nameNodes[2].path, ["contacts", "1", "name"])
 
         // Test finding "phone" nodes
         let phoneNodes = json.findNodes(withKey: "phone")
