@@ -19,7 +19,7 @@ jobs:
       - name: Run Tests
         run: |
           mkdir -p test-output
-          swift test --enable-test-discovery 2>&1 | tee test.log | xcbeautify
+          swift test 2>&1 | tee test.log | xcbeautify
       - name: Generate JUnit Report
         if: always()
         run: |
