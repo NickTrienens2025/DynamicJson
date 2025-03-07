@@ -1,14 +1,31 @@
 name: CI
-
 on: push
-
 jobs:
   test:
     runs-on: macos-15
-    
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_16.1.app
+      - name: Install xcbeautify
+        run: brew install xcbeautify
       - name: Test
-        run: swift test
+        run: set -o pipefail && swift test --enable-test-discovery 2>&1 | xcbeautify --report junit --output test-results.xml
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results.xml
+      - name: Report Test Results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Swift Tests
+          path: test-results.xml
+          reporter: java-junit
+          fail-on-error: true
