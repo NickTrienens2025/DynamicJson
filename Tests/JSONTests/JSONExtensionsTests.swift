@@ -132,4 +132,94 @@ final class JSONExtensionsTests: XCTestCase {
         XCTAssertNil(cleaned[1]["remove"].asString())
         XCTAssertNotNil(cleaned[1]["keep"].asString())
     }
+
+    func testArrayToJsonString() {
+        let array: [JSON] = [
+            .string("test"),
+            .integer(42),
+            .double(3.14),
+            .boolean(true),
+            .null
+        ]
+        
+        let expected = """
+[
+  "test",
+  42,
+  3.14,
+  true,
+  null
+]
+"""
+        XCTAssertEqual(array.asJsonString(), expected)
+    }
+
+    func testDictionaryToJsonString() {
+        let dict: [String: JSON] = [
+            "string": .string("test"),
+            "integer": .integer(42),
+            "double": .double(3.14),
+            "boolean": .boolean(true),
+            "null": .null
+        ]
+        
+        let expected = """
+{
+  "boolean" : true,
+  "double" : 3.14,
+  "integer" : 42,
+  "null" : null,
+  "string" : "test"
+}
+"""
+        XCTAssertEqual(dict.asJsonString(), expected)
+    }
+
+    func testEmptyArrayToJsonString() {
+        let array: [JSON] = []
+        XCTAssertEqual(array.asJsonString(), "[\n\n]")
+    }
+
+    func testEmptyDictionaryToJsonString() {
+        let dict: [String: JSON] = [:]
+        XCTAssertEqual(dict.asJsonString(), "{\n\n}")
+    }
+
+    func testNestedArrayToJsonString() {
+        let array: [JSON] = [
+            .array([.string("nested")]),
+            .object(["key": .string("value")])
+        ]
+        
+        let expected = """
+[
+  [
+    "nested"
+  ],
+  {
+    "key" : "value"
+  }
+]
+"""
+        XCTAssertEqual(array.asJsonString(), expected)
+    }
+
+    func testNestedDictionaryToJsonString() {
+        let dict: [String: JSON] = [
+            "array": .array([.string("nested")]),
+            "object": .object(["key": .string("value")])
+        ]
+        
+        let expected = """
+{
+  "array" : [
+    "nested"
+  ],
+  "object" : {
+    "key" : "value"
+  }
+}
+"""
+        XCTAssertEqual(dict.asJsonString(), expected)
+    }
 }

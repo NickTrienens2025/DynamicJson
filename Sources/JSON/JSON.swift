@@ -352,10 +352,10 @@ public enum JSON:
     public func asIntDefaulting( to: Int = 0) -> Int {
         asInt() ?? to
     }
-    public func asObjectDefaulting( to: [String: JSON]) -> [String: JSON] {
+    public func asObjectDefaulting( to: [String: JSON] = [:]) -> [String: JSON] {
         asObject() ?? to
     }
-    public func asArrayDefaulting( to: [JSON]) -> [JSON] {
+    public func asArrayDefaulting( to: [JSON] = []) -> [JSON] {
         asArray() ?? to
     }
     public func asDoubleDefaulting( to: Double = 0) -> Double {
@@ -615,6 +615,18 @@ extension JSON: Codable {
         case let .object(dictionary):
             try container.encode(dictionary)
         }
+    }
+}
+
+public extension Array where Element == JSON {
+    func asJsonString() -> String {
+        JSON(self).asJsonString()
+    }
+}
+
+public extension [String: JSON] {
+    func asJsonString() -> String {
+        JSON(self).asJsonString()
     }
 }
 
