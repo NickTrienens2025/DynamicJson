@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "JSON",
+    name: "DynamicJson",
      platforms: [.macOS(.v14),
                   .iOS(.v16),
                   .tvOS(.v16),
