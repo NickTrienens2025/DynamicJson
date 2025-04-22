@@ -5,7 +5,7 @@
 //  Created by Nick Trienens on 2/22/25.
 //
 
-import JSON
+import DynamicJson
 import XCTest
 
 final class JSONRemoveTests: XCTestCase {

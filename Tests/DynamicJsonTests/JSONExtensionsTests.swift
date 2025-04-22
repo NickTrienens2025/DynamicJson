@@ -1,6 +1,6 @@
 import XCTest
 
-@testable import JSON
+@testable import DynamicJson
 
 final class JSONExtensionsTests: XCTestCase {
     func testOptional() {

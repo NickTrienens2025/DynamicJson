@@ -1,5 +1,5 @@
 import XCTest
-@testable import JSON
+@testable import DynamicJson
 
 final class JSONComparableTests: XCTestCase {
     // MARK: - String Tests

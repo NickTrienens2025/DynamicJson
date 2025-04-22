@@ -22,7 +22,7 @@ let package = Package(
             dependencies: []
         ),
         .testTarget(
-            name: "JSONTests",
+            name: "DynamicJsonTests",
             dependencies: ["DynamicJson"]
         ),
     ]

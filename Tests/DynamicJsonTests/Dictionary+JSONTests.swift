@@ -1,4 +1,4 @@
-import JSON
+import DynamicJson
 import XCTest
 
 final class DictionaryJSONTests: XCTestCase {
