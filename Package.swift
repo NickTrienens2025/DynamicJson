@@ -10,20 +10,20 @@ let package = Package(
                   .watchOS(.v8)],
     products: [
         .library(
-            name: "JSON",
-            targets: ["JSON"]
+            name: "DynamicJson",
+            targets: ["DynamicJson"]
         ),
     ],
     dependencies: [
     ],
     targets: [
         .target(
-            name: "JSON",
+            name: "DynamicJson",
             dependencies: []
         ),
         .testTarget(
             name: "JSONTests",
-            dependencies: ["JSON"]
+            dependencies: ["DynamicJson"]
         ),
     ]
 )
