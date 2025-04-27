@@ -37,6 +37,31 @@ public enum JSON:
     public init(_ dictionary: [String: Any?]) {
         self = dictionary.json
     }
+    
+    /// Creates a JSON object from Data.
+    /// - Parameter data: The JSON data to parse
+    /// - Throws: `DecodingError` if the data cannot be decoded as JSON
+    public init(data: Data) throws {
+        let decoder = JSONDecoder()
+        self = try decoder.decode(JSON.self, from: data)
+    }
+    
+    /// Creates a JSON object from a string containing JSON.
+    /// - Parameters:
+    ///   - jsonString: A string containing JSON
+    ///   - options: The reading options to use. Default is empty.
+    /// - Throws: Error if the string is not valid JSON
+    public init(jsonString: String, options: JSONSerialization.ReadingOptions = []) throws {
+        guard let data = jsonString.data(using: .utf8) else {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(
+                    codingPath: [],
+                    debugDescription: "Could not convert string to data using UTF-8 encoding"
+                )
+            )
+        }
+        try self.init(data: data)
+    }
 
     // MARK: - Dynamic Member Access
 
@@ -648,6 +673,27 @@ extension [String: Any?] {
             }
         }
         return .object(dictionary)
+    }
+}
+
+// MARK: - String and Data extensions
+public extension String {
+    /// Converts a JSON string to a JSON object
+    /// - Parameter options: JSONSerialization reading options
+    /// - Returns: A JSON object
+    /// - Throws: Error if the string is not valid JSON
+    func asJSON(options: JSONSerialization.ReadingOptions = []) throws -> JSON {
+        try JSON(jsonString: self, options: options)
+    }
+}
+
+public extension Data {
+    /// Converts JSON data to a JSON object
+    /// - Parameter options: JSONSerialization reading options
+    /// - Returns: A JSON object
+    /// - Throws: Error if the data is not valid JSON
+    func asJSON(options: JSONSerialization.ReadingOptions = []) throws -> JSON {
+        try JSON(data: self)
     }
 }
 
