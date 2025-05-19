@@ -448,12 +448,12 @@ public enum JSON:
 
     // MARK: - Conversions
 
-    public func asJsonString() -> String {
+    public func asJsonString(outputFormatting: JSONEncoder.OutputFormatting? = nil) -> String {
         let encoder = JSONEncoder()
         if #available(macOS 10.15, *) {
-            encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys]
+            encoder.outputFormatting = outputFormatting ?? [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys]
         } else {
-            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+            encoder.outputFormatting = outputFormatting ?? [.prettyPrinted, .sortedKeys]
         }
         if let data = try? encoder.encode(self),
            let jString = String(data: data, encoding: .utf8)
