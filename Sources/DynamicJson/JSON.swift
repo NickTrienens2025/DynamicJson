@@ -473,6 +473,27 @@ public enum JSON:
         }
         return try encoder.encode(self)
     }
+
+    /// Returns the Foundation form of the receiver: `[String: Any]`, `[Any]`, `String`, `Int`,
+    /// `Double`, `Bool`, or `NSNull` for `.null`. Suitable for `JSONSerialization` and for
+    /// APIs that take `[String: Any]`.
+    public func asAny() -> Any {
+        switch self {
+        case let .object(value): value.mapValues { $0.asAny() }
+        case let .array(value): value.map { $0.asAny() }
+        case let .string(value): value
+        case let .integer(value): value
+        case let .double(value): value
+        case let .boolean(value): value
+        case .null: NSNull()
+        }
+    }
+
+    /// Returns a `[String: Any]` representation of the receiver if the underlying type is
+    /// `.object`, otherwise `nil`. Nested `.null` values become `NSNull`.
+    public func asDictionary() -> [String: Any]? {
+        asObject()?.mapValues { $0.asAny() }
+    }
 }
 
 // MARK: - ExpressibleByLiteral
@@ -706,6 +727,10 @@ private extension Any? {
         case let e as [String: Any?]: return e.json
         case is NSNull: return .null
         case let e as String: return .string(e)
+        #if canImport(Darwin)
+        // Must precede `as Bool`/`as Double`: NSNumber 0/1 casts to Bool and 2 to Double.
+        case let e as NSNumber: return e.json
+        #endif
         // The above cases should catch everything, but, in case they
         // don't, we try remaining types here.
         case let e as Bool: return .boolean(e)
@@ -727,3 +752,13 @@ private extension Any? {
         }
     }
 }
+
+#if canImport(Darwin)
+private extension NSNumber {
+    var json: JSON {
+        if CFGetTypeID(self) == CFBooleanGetTypeID() { return .boolean(boolValue) }
+        if CFNumberIsFloatType(self) { return .double(doubleValue) }
+        return .integer(intValue)
+    }
+}
+#endif
