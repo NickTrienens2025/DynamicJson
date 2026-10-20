@@ -473,6 +473,27 @@ public enum JSON:
         }
         return try encoder.encode(self)
     }
+
+    /// Returns the Foundation form of the receiver: `[String: Any]`, `[Any]`, `String`, `Int`,
+    /// `Double`, `Bool`, or `NSNull` for `.null`. Suitable for `JSONSerialization` and for
+    /// APIs that take `[String: Any]`.
+    public func asAny() -> Any {
+        switch self {
+        case let .object(value): value.mapValues { $0.asAny() }
+        case let .array(value): value.map { $0.asAny() }
+        case let .string(value): value
+        case let .integer(value): value
+        case let .double(value): value
+        case let .boolean(value): value
+        case .null: NSNull()
+        }
+    }
+
+    /// Returns a `[String: Any]` representation of the receiver if the underlying type is
+    /// `.object`, otherwise `nil`. Nested `.null` values become `NSNull`.
+    public func asDictionary() -> [String: Any]? {
+        asObject()?.mapValues { $0.asAny() }
+    }
 }
 
 // MARK: - ExpressibleByLiteral
